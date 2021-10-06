@@ -4,5 +4,5 @@ build:
   services:
     - docker:20.10.8-dind
   script:
-    - docker login -u $CI_REGISTRY_USER -p $HUB_PUSH_TOKEN hub.docker.com
+    - echo $HUB_PUSH_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin registry-1.docker.io
     - make
