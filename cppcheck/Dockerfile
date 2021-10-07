@@ -5,6 +5,7 @@ RUN apt-get update
 RUN apt-get install --yes --no-install-recommends cmake git
 
 FROM base AS cppcheck-build-env
+
 ARG CPPCHECK_VERSION_TAG
 # Build cppcheck (rundeps: pcre for rules, python for misra)
 # PCRE is recommended for rules, python3 is for misra checker and build optimizations

@@ -6,11 +6,13 @@ ARG IKOS_VERSION_TAG
 RUN apt-get update
 RUN apt-get install --yes --no-install-recommends cmake git
 
-
 FROM base AS compile-base
 RUN apt-get install --yes --no-install-recommends build-essential
 
 FROM compile-base AS ikos-build-env
+
+ARG IKOS_VERSION_TAG
+
 RUN apt-get install --yes --no-install-recommends gcc g++ cmake libgmp-dev libboost-dev libboost-filesystem-dev \
     libboost-thread-dev libboost-test-dev python3 python3-pygments libsqlite3-dev libtbb-dev \
     libz-dev libedit-dev llvm-9 llvm-9-dev llvm-9-tools clang-9

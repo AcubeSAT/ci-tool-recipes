@@ -5,13 +5,13 @@
 FROM debian:bullseye-slim AS base
 WORKDIR /root/
 
-ARG CLANG_TOOLS_VERSION_TAG
-ARG CLANG_HTML_VERSION_TAG
-
 RUN apt-get update
 RUN apt-get install --yes --no-install-recommends cmake git
 
 FROM base AS clang-build-env
+
+ARG CLANG_TOOLS_VERSION_TAG
+
 RUN apt-get install --yes --no-install-recommends checkinstall ca-certificates build-essential libz3-dev python3
 RUN git clone --depth 1 --branch llvmorg-${CLANG_TOOLS_VERSION_TAG} https://github.com/llvm/llvm-project
 WORKDIR /root/llvm-project/build
@@ -28,6 +28,9 @@ RUN checkinstall -type=debian --pkgname=clang-static-analysis --pkgversion=${CLA
 		make install-clang-stripped install-scan-build-stripped install-scan-view-stripped
 
 FROM base as clang-html-build-env
+
+ARG CLANG_HTML_VERSION_TAG
+
 RUN apt-get install --yes --no-install-recommends ca-certificates python3-setuptools checkinstall python3-lxml python3-bs4
 RUN git clone --depth 1 --branch v${CLANG_HTML_VERSION_TAG} https://github.com/austinbhale/Clang-Visualizer
 WORKDIR Clang-Visualizer
