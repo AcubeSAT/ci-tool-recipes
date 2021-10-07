@@ -9,7 +9,19 @@ variables:
   IKOS_VERSION_TAG: '3.0'
 
 stages:
+  - init
   - build
+  - push
+
+build-base:
+  image: docker:20.10.8
+  stage: init
+  services:
+    - docker:20.10.8-dind
+  script:
+    - docker build -f base/Dockerfile -t base
+  artifacts:
+    image: base
 
 build-cppcheck:
   image: docker:20.10.8
@@ -19,34 +31,34 @@ build-cppcheck:
   script:
     - docker build . -f cppcheck/Dockerfile --build-arg CPPCHECK_VERSION_TAG=$CPPCHECK_VERSION_TAG -t cppcheck:$CPPCHECK_VERSION_TAG
 
-build-doxygen:
-  image: docker:20.10.8
-  stage: build
-  services:
-    - docker:20.10.8-dind
-  script:
-    - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
+#build-doxygen:
+#  image: docker:20.10.8
+#  stage: build
+#  services:
+#    - docker:20.10.8-dind
+#  script:
+#    - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
 
-build-clang-tools:
-  image: docker:20.10.8
-  stage: build
-  services:
-    - docker:20.10.8-dind
-  script:
-    - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+#build-clang-tools:
+#  image: docker:20.10.8
+#  stage: build
+#  services:
+#    - docker:20.10.8-dind
+#  script:
+#    - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
 
-build-coverage:
-  image: docker:20.10.8
-  stage: build
-  services:
-    - docker:20.10.8-dind
-  script:
-    - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
+#build-coverage:
+#  image: docker:20.10.8
+#  stage: build
+#  services:
+#    - docker:20.10.8-dind
+#  script:
+#    - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
 
-build-ikos:
-  image: docker:20.10.8
-  stage: build
-  services:
-    - docker:20.10.8-dind
-  script:
-    - docker build . -f ikos/Dockerfile --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t ikos:$IKOS_VERSION_TAG
+#build-ikos:
+#  image: docker:20.10.8
+#  stage: build
+#  services:
+#    - docker:20.10.8-dind
+#  script:
+#    - docker build . -f ikos/Dockerfile --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t ikos:$IKOS_VERSION_TAG
