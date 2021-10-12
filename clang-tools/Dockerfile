@@ -46,5 +46,3 @@ COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb .
 
 # Install everything
 RUN apt install --yes --no-install-recommends ./*.deb
-
-ENTRYPOINT ["/bin/sh", "-c"]

@@ -41,5 +41,3 @@ COPY --from=cppcheck-build-env /root/cppcheck/build/*.deb .
 
 # Install everything
 RUN apt install --yes --no-install-recommends ./*.deb 
-
-ENTRYPOINT ["/bin/sh", "-c"]

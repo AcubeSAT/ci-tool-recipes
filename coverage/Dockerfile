@@ -37,6 +37,3 @@ COPY --from=gcovr-build-env /root/gcovr/*.deb .
 COPY --from=lcov-build-env /root/lcov/*.deb .
 # Install everything
 RUN apt install --yes --no-install-recommends ./*.deb 
-
-# Start a new shell
-ENTRYPOINT ["/bin/sh", "-c"]

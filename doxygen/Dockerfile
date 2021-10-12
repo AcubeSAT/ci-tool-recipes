@@ -37,6 +37,3 @@ COPY --from=doxygen-awesome-css-build-env /root/*.tar.gz .
 # Install everything
 RUN apt install --yes --no-install-recommends ./*.deb && \
 		tar -vzxf *.tar.gz && rm *.tar.gz
-
-# Start a new shell
-ENTRYPOINT ["/bin/sh", "-c"]
