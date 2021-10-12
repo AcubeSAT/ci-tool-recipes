@@ -12,55 +12,82 @@ stages:
   - build
   - deploy
 
-build-cppcheck:
+cppcheck:
   image: docker:20.10.8
   stage: build
   services:
     - docker:20.10.8-dind
   script:
     - docker build . -f cppcheck/Dockerfile --build-arg CPPCHECK_VERSION_TAG=$CPPCHECK_VERSION_TAG -t spacedot/cppcheck:$CPPCHECK_VERSION_TAG
+    - docker save -o cppcheck:$CPPCHECK_VERSION_TAG.tar spacedot/cppcheck:$CPPCHECK_VERSION_TAG
+  artifacts:
+    paths:
+      - ./cppcheck:$CPPCHECK_VERSION_TAG.tar
 
-build-doxygen:
+doxygen:
   image: docker:20.10.8
   stage: build
   services:
     - docker:20.10.8-dind
   script:
     - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t spacedot/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
+    - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar spacedot/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
+  artifacts:
+    paths:
+      - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss_$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
 
-build-clang-tools:
-  image: docker:20.10.8
-  stage: build
-  services:
-    - docker:20.10.8-dind
-  script:
-    - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t spacedot/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+#build-clang-tools:
+#image: docker:20.10.8
+#stage: build
+#services:
+#- docker:20.10.8-dind
+#script:
+#- docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t spacedot/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+#docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar 
+#artifacts:
+#paths:
+#- ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
 
-build-coverage:
+coverage:
   image: docker:20.10.8
   stage: build
   services:
     - docker:20.10.8-dind
   script:
     - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t spacedot/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
+    - docker save -o coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar spacedot/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
+  artifacts:
+    paths:
+      - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
 
-build-ikos:
+ikos:
   image: docker:20.10.8
   stage: build
   services:
     - docker:20.10.8-dind
   script:
     - docker build . -f ikos/Dockerfile --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t spacedot/ikos:$IKOS_VERSION_TAG
+    - docker save -o ikos:$IKOS_VERSION_TAG.tar spacedot/ikos:$IKOS_VERSION_TAG
+  artifacts:
+    paths:
+      - ./ikos:$IKOS_VERSION_TAG.tar
 
 deploy-all:
   image: docker:20.10.8
   stage: deploy
+  dependencies:
+    - cppcheck
+    - doxygen
+#    - clang-tools
+    - coverage
+    - ikos
   services:
     - docker:20.10.8-dind
   script:
+    - docker load -i ./*.tar
     - echo $HUB_PUSH_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin registry-1.docker.io
     - docker push spacedot/cppcheck:$CPPCHECK_VERSION_TAG
-    - docker push spacedot/clang-tools:$CPPCHECK_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+#    - docker push spacedot/clang-tools:$CPPCHECK_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
     - docker push spacedot/doxygen:$CPPCHECK_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker push spacedot/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
     - docker push spacedot/ikos:$IKOS_VERSION_TAG
