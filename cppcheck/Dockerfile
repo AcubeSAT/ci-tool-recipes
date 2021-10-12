@@ -37,7 +37,7 @@ RUN checkinstall --type=debian --pkgname=cppcheck --pkgversion=${CPPCHECK_VERSIO
 
 # FINAL IMAGE
 FROM base AS final
-COPY --from=cppcheck-build-env /root/cppcheck/build/*.deb .
+COPY --from=cppcheck-build-env /root/cppcheck/build/*.deb ./
 
 # Install everything
 RUN apt install --yes --no-install-recommends ./*.deb 
