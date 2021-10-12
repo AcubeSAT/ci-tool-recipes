@@ -23,7 +23,7 @@ RUN checkinstall --type=debian --pkgname=doxygen --pkgversion=${DOXYGEN_VERSION_
 
 FROM base AS doxygen-awesome-css-build-env
 
-ARG DOXYGEN_VERSION_TAG
+ARG DOXYGEN_AWESOME_CSS_VERSION_TAG
 
 RUN apt-get install --yes --no-install-recommends ca-certificates checkinstall
 RUN git clone --depth 1 --branch v${DOXYGEN_AWESOME_CSS_VERSION_TAG} https://github.com/jothepro/doxygen-awesome-css.git
