@@ -34,7 +34,7 @@ doxygen:
     - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar spacedot/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
   artifacts:
     paths:
-      - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss_$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
+      - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
 
 #build-clang-tools:
 #image: docker:20.10.8
