@@ -84,7 +84,7 @@ deploy-all:
   services:
     - docker:20.10.8-dind
   before_script:
-    docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker load -i ./*.tar
     - docker push spacedot/cppcheck:$CPPCHECK_VERSION_TAG
