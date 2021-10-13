@@ -85,7 +85,8 @@ deploy-all:
     - docker:20.10.8-dind
   script:
     - docker load -i ./*.tar
-    - echo $HUB_PUSH_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin registry-1.docker.io && docker push spacedot/cppcheck:$CPPCHECK_VERSION_TAG
+    - echo $HUB_PUSH_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin registry-1.docker.io
+    - docker login && docker push spacedot/cppcheck:$CPPCHECK_VERSION_TAG
 #    - docker push spacedot/clang-tools:$CPPCHECK_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
 #    - docker push spacedot/doxygen:$CPPCHECK_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
 #    - docker push spacedot/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
