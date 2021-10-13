@@ -87,6 +87,7 @@ deploy-all:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker load -i ./*.tar
+    - docker tag spacedot/cppcheck:$CPPCHECK_VERSION_TAG spacedot/cppcheck:$CPPCHECK_VERSION_TAG
     - docker push spacedot/cppcheck:$CPPCHECK_VERSION_TAG
 #    - docker push spacedot/clang-tools:$CPPCHECK_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
 #    - docker push spacedot/doxygen:$CPPCHECK_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
