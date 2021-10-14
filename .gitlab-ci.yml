@@ -18,8 +18,8 @@ cppcheck:
   services:
     - docker:20.10.8-dind
   script:
-    - docker build . -f cppcheck/Dockerfile --build-arg CPPCHECK_VERSION_TAG=$CPPCHECK_VERSION_TAG -t spacedot/cppcheck:$CPPCHECK_VERSION_TAG
-    - docker save -o cppcheck:$CPPCHECK_VERSION_TAG.tar spacedot/cppcheck:$CPPCHECK_VERSION_TAG
+    - docker build . -f cppcheck/Dockerfile --build-arg CPPCHECK_VERSION_TAG=$CPPCHECK_VERSION_TAG -t docker.io/spacedot/cppcheck:$CPPCHECK_VERSION_TAG
+    - docker save -o cppcheck:$CPPCHECK_VERSION_TAG.tar docker.io/spacedot/cppcheck:$CPPCHECK_VERSION_TAG
   artifacts:
     paths:
       - ./cppcheck:$CPPCHECK_VERSION_TAG.tar
@@ -87,8 +87,8 @@ deploy-all:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
     - docker load -i ./*.tar
-    - docker tag spacedot/cppcheck:$CPPCHECK_VERSION_TAG spacedot/cppcheck:$CPPCHECK_VERSION_TAG
-    - docker push spacedot/cppcheck:$CPPCHECK_VERSION_TAG
+    - docker tag docker.io/spacedot/cppcheck:$CPPCHECK_VERSION_TAG docker.io/spacedot/cppcheck:$CPPCHECK_VERSION_TAG
+    - docker push docker.io/spacedot/cppcheck:$CPPCHECK_VERSION_TAG
 #    - docker push spacedot/clang-tools:$CPPCHECK_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
 #    - docker push spacedot/doxygen:$CPPCHECK_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
 #    - docker push spacedot/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
