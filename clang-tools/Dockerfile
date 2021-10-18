@@ -45,4 +45,10 @@ COPY --from=clang-build-env /root/llvm-project/build/*.deb .
 COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb .
 
 # Install everything
-RUN apt install --yes --no-install-recommends ./*.deb
+
+# binutils, make are needed to run scan-build though are not explicit dependencies (TODO add them to base image)
+# libc-dev, libgcc-10-dev libstdc++-10-dev are needed because Clang itself was compiled with GCC (10.x as of 19/10/2021)
+# and thus is not properly "bootstrapped". This shouldn't matter because here it is used only as a static analysis tool,
+# not for compiling real programs. Proper bootstrapping will take hours to build, and needs a strong PC.
+# TODO when GitLab takes the brunt of building and deployment itself.
+RUN apt install --yes --no-install-recommends ./*.deb binutils libc-dev make libgcc-10-dev libstdc++-10-dev
