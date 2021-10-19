@@ -25,7 +25,7 @@ RUN checkinstall -type=debian --pkgname=clang-tidy --pkgversion=${CLANG_TOOLS_VE
 		make install-clang-tidy-stripped
 RUN checkinstall -type=debian --pkgname=clang-static-analysis --pkgversion=${CLANG_TOOLS_VERSION_TAG} \
 		--pkgrelease="CUSTOM" --provides=clang-static-analysis --requires="libz3-4 \(\>= 4.8.10\),python3 \(\>= 3.9.2\)" \
-		make install-clang-stripped install-scan-build-stripped install-scan-view-stripped
+		make install-clang-stripped install-clang-resource-headers-stripped install-scan-build-stripped install-scan-view-stripped
 
 FROM base as clang-html-build-env
 
