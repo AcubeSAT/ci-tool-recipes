@@ -6,7 +6,7 @@ ARG CPPCHECK_VERSION_TAG
 #RUN apt-get install --yes --no-install-recommends build-essential checkinstall ca-certificates libpcre3-dev \
 #		python3 python3-pytest python3-setuptools python3-pygments tidy libxml2-utils
 
-RUN apt-get install --yes --no-install-recommends libpcre3-dev python3 python3-pytest python3-setuptools python3-pygments tidy libxml2-utils
+RUN apt-get install --yes --no-install-recommends libpcre3-dev tidy libxml2-utils
 
 RUN git clone --depth 1 --branch ${CPPCHECK_VERSION_TAG} https://github.com/danmar/cppcheck
 WORKDIR /root/cppcheck/build
