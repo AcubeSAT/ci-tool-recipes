@@ -3,19 +3,17 @@ FROM spacedot/build-base AS cppcheck-build-env
 ARG CPPCHECK_VERSION_TAG
 # Build cppcheck (rundeps: pcre for rules, python for misra)
 # PCRE is recommended for rules, python3 is for misra checker and build optimizations
-#RUN apt-get install --yes --no-install-recommends build-essential checkinstall ca-certificates libpcre3-dev \
-#		python3 python3-pytest python3-setuptools python3-pygments tidy libxml2-utils
 
 RUN apt-get install --yes --no-install-recommends libpcre3-dev tidy libxml2-utils
 
 RUN git clone --depth 1 --branch ${CPPCHECK_VERSION_TAG} https://github.com/danmar/cppcheck
 WORKDIR /root/cppcheck/build
-RUN cmake .. -DHAVE_RULES=ON -DUSE_MATCHCOMPILER=ON -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
-RUN make -j$(nproc)
+RUN cmake .. -DHAVE_RULES=ON -DUSE_MATCHCOMPILER=ON -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release -GNinja
+RUN ninja -j$(nproc)
 
 # Test cppcheck itself, the MISRA plugin and cppcheck-htmlreport
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-RUN make test # run test suite
+RUN ninja test # run test suite
 WORKDIR /root/cppcheck
 RUN PYTHONPATH=addons python3 -m pytest addons/test/test-misra.py # run misra tests
 RUN ln -s ./build/bin/cppcheck ./cppcheck # prepare for cppcheck-htmlreport test
