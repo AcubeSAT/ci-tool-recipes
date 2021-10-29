@@ -4,7 +4,6 @@ FROM spacedot/build-base AS gcovr-build-env
 
 ARG GCOVR_VERSION_TAG
 
-#RUN apt-get install --yes --no-install-recommends python3
 RUN git clone --depth 1 --branch ${GCOVR_VERSION_TAG} https://github.com/gcovr/gcovr
 WORKDIR /root/gcovr
 
