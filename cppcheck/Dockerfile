@@ -1,16 +1,12 @@
-FROM debian:bullseye-slim AS base
-WORKDIR /root/
-
-RUN apt-get update
-RUN apt-get install --yes --no-install-recommends cmake git
-
-FROM base AS cppcheck-build-env
+FROM spacedot/build-base AS cppcheck-build-env
 
 ARG CPPCHECK_VERSION_TAG
 # Build cppcheck (rundeps: pcre for rules, python for misra)
 # PCRE is recommended for rules, python3 is for misra checker and build optimizations
-RUN apt-get install --yes --no-install-recommends build-essential checkinstall ca-certificates libpcre3-dev \
-		python3 python3-pytest python3-setuptools python3-pygments tidy libxml2-utils
+#RUN apt-get install --yes --no-install-recommends build-essential checkinstall ca-certificates libpcre3-dev \
+#		python3 python3-pytest python3-setuptools python3-pygments tidy libxml2-utils
+
+RUN apt-get install --yes --no-install-recommends libpcre3-dev python3 python3-pytest python3-setuptools python3-pygments tidy libxml2-utils
 
 RUN git clone --depth 1 --branch ${CPPCHECK_VERSION_TAG} https://github.com/danmar/cppcheck
 WORKDIR /root/cppcheck/build
@@ -36,7 +32,7 @@ RUN checkinstall --type=debian --pkgname=cppcheck --pkgversion=${CPPCHECK_VERSIO
 		--provides=cppcheck --requires="libpcre3 \(\>= 8.39\),python3 \(\>= 3.9.2\)" --default
 
 # FINAL IMAGE
-FROM base AS final
+FROM spacedot/deploy-base AS final
 COPY --from=cppcheck-build-env /root/cppcheck/build/*.deb ./
 
 # Install everything
