@@ -4,11 +4,11 @@ FROM spacedot/build-base AS gcovr-build-env
 
 ARG GCOVR_VERSION_TAG
 
-RUN apt-get install --yes --no-install-recommends python3
+#RUN apt-get install --yes --no-install-recommends python3
 RUN git clone --depth 1 --branch ${GCOVR_VERSION_TAG} https://github.com/gcovr/gcovr
 WORKDIR /root/gcovr
 
-RUN apt-get install --yes --no-install-recommends python3-pytest python3-setuptools python3-lxml python3-pyutilib python3-jinja2 python3-markupsafe python3-pygments
+RUN apt-get install --yes --no-install-recommends python3-lxml python3-pyutilib python3-jinja2 python3-markupsafe
 RUN python3 setup.py build
 #RUN CC=gcc-10 make test
 RUN checkinstall --type=debian --pkgname=gcovr --pkgversion=${GCOVR_VERSION_TAG} --pkgrelease="CUSTOM" \
