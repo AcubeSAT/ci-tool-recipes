@@ -3,9 +3,8 @@ FROM spacedot/build-base AS ikos-build-env
 ARG IKOS_VERSION_TAG
 
 RUN apt-get install --yes --no-install-recommends libgmp-dev libboost-dev libboost-filesystem-dev \
-    libboost-thread-dev libboost-test-dev python3 python3-pygments libsqlite3-dev libtbb-dev \
-    libz-dev libedit-dev llvm-9 llvm-9-dev llvm-9-tools clang-9
-RUN apt-get install --yes --no-install-recommends python3-distutils libmpfr-dev
+    libboost-thread-dev libboost-test-dev libsqlite3-dev libtbb-dev \
+    libz-dev libedit-dev llvm-9 llvm-9-dev llvm-9-tools clang-9 python3-distutils libmpfr-dev
 RUN git clone --depth 1 --branch v${IKOS_VERSION_TAG} https://github.com/NASA-SW-VnV/ikos
 WORKDIR ikos
 # Python >3.9 changed the function name, updating
