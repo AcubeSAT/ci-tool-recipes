@@ -1,22 +1,11 @@
-FROM debian:bullseye-slim AS base
-WORKDIR /root/
+FROM spacedot/build-base AS ikos-build-env
 
 ARG IKOS_VERSION_TAG
 
-RUN apt-get update
-RUN apt-get install --yes --no-install-recommends cmake git
-
-FROM base AS compile-base
-RUN apt-get install --yes --no-install-recommends build-essential
-
-FROM compile-base AS ikos-build-env
-
-ARG IKOS_VERSION_TAG
-
-RUN apt-get install --yes --no-install-recommends gcc g++ cmake libgmp-dev libboost-dev libboost-filesystem-dev \
+RUN apt-get install --yes --no-install-recommends libgmp-dev libboost-dev libboost-filesystem-dev \
     libboost-thread-dev libboost-test-dev python3 python3-pygments libsqlite3-dev libtbb-dev \
     libz-dev libedit-dev llvm-9 llvm-9-dev llvm-9-tools clang-9
-RUN apt-get install --yes --no-install-recommends ca-certificates checkinstall python3-distutils libmpfr-dev
+RUN apt-get install --yes --no-install-recommends python3-distutils libmpfr-dev
 RUN git clone --depth 1 --branch v${IKOS_VERSION_TAG} https://github.com/NASA-SW-VnV/ikos
 WORKDIR ikos
 # Python >3.9 changed the function name, updating
@@ -34,8 +23,7 @@ RUN checkinstall --type=debian --pkgname=ikos --pkgversion=${IKOS_VERSION_TAG} -
 	--strip=yes --fstrans=no \
 	--default make install
 
-
-FROM base AS final
+FROM spacedot/deploy-base AS final
 WORKDIR /root/
 COPY --from=ikos-build-env /root/ikos/build/*.deb .
 RUN apt install --yes --no-install-recommends ./*.deb
