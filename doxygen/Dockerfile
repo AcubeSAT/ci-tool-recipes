@@ -5,11 +5,11 @@ ARG DOXYGEN_VERSION_TAG
 RUN apt-get install --yes --no-install-recommends flex bison texlive # texlive: needed to run doxygen's testsuite
 RUN git clone --depth 1 --branch Release_$(echo ${DOXYGEN_VERSION_TAG} | sed 's/\./\_/g') https://github.com/doxygen/doxygen.git
 WORKDIR doxygen/build
-RUN cmake .. 
-RUN make -j$(nproc)
-RUN make tests
+RUN cmake .. -GNinja 
+RUN ninja -j$(nproc)
+RUN ninja tests
 RUN checkinstall --type=debian --pkgname=doxygen --pkgversion=${DOXYGEN_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=doxygen --requires="" make install
+		--pkgrelease="CUSTOM" --provides=doxygen --requires="" ninja install
 
 FROM spacedot/build-base AS doxygen-awesome-css-build-env
 
