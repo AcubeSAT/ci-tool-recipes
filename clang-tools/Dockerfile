@@ -6,7 +6,7 @@ FROM spacedot/build-base AS clang-build-env
 
 ARG CLANG_TOOLS_VERSION_TAG
 
-RUN apt-get install --yes --no-install-recommends libz3-dev python3
+#RUN apt-get install --yes --no-install-recommends libz3-dev python3
 RUN git clone --depth 1 --branch llvmorg-${CLANG_TOOLS_VERSION_TAG} https://github.com/llvm/llvm-project
 WORKDIR /root/llvm-project/build
 RUN cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang-tools-extra;clang" \
@@ -25,7 +25,7 @@ FROM spacedot/build-base as clang-html-build-env
 
 ARG CLANG_HTML_VERSION_TAG
 
-RUN apt-get install --yes --no-install-recommends python3-setuptools python3-lxml python3-bs4
+RUN apt-get install --yes --no-install-recommends python3-lxml python3-bs4
 RUN git clone --depth 1 --branch v${CLANG_HTML_VERSION_TAG} https://github.com/austinbhale/Clang-Visualizer
 WORKDIR Clang-Visualizer
 RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTML_VERSION_TAG} \
@@ -45,4 +45,4 @@ COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb .
 # and thus is not properly "bootstrapped". This shouldn't matter because here it is used only as a static analysis tool,
 # not for compiling real programs. Proper bootstrapping will take hours to build, and needs a strong PC.
 # TODO when GitLab takes the brunt of building and deployment itself.
-RUN apt install --yes --no-install-recommends ./*.deb binutils libc-dev make libgcc-10-dev libstdc++-10-dev
+RUN apt install --yes --no-install-recommends ./*.deb libc-dev libstdc++-10-dev
