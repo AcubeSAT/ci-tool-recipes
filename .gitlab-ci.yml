@@ -16,19 +16,17 @@ variables:
   DOCKER_BUILDKIT: 1
   
 stages:
-  - init
   - build
   - deploy
 
 build-bases:
-  stage: init
-  variables:
-    BASE_BUILD_DATE: $(date -u '+%Y%m%dZ%H-%M-%S')
+  stage: build
   script:
-    - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/CI_REGISTRY_USER/build-base:latest
-    - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/CI_REGISTRY_USER/deploy-base:latest
-    - docker save -o build-base.tar $CI_REGISTRY/CI_REGISTRY_USER/build-base
-    - docker save -o deploy-base.tar $CI_REGISTRY/CI_REGISTRY_USER/deploy-base
+    - export BASE_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
+    - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:latest
+    - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:latest
+    - docker save -o build-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/build-base
+    - docker save -o deploy-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
   artifacts:
     paths:
       - ./build-base.tar
@@ -36,8 +34,8 @@ build-bases:
 
 cppcheck:
   stage: build
-  dependencies:
-    - init
+  needs:
+    - build-bases
   script:
     - docker load -i ./*.tar
     - docker build . -f cppcheck/Dockerfile --build-arg CPPCHECK_VERSION_TAG=$CPPCHECK_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
@@ -48,8 +46,8 @@ cppcheck:
 
 doxygen:
   stage: build
-  dependencies:
-    - init
+  needs:
+    - build-bases
   script:
     - docker load -i ./*.tar
     - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
@@ -61,8 +59,8 @@ doxygen:
 clang-tools:
   stage: build
   timeout: 6 hours
-  dependencies:
-    - init
+  needs:
+    - build-bases
   script:
     - docker load -i ./*.tar
     - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
@@ -73,8 +71,8 @@ clang-tools:
 
 coverage:
   stage: build
-  dependencies:
-    - init
+  needs:
+    - build-bases
   script:
     - docker load -i ./*.tar
     - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
@@ -85,8 +83,8 @@ coverage:
 
 ikos:
   stage: build
-  dependencies:
-    - init
+  needs:
+    - build-bases
   script:
     - docker load -i ./*.tar
     - docker build . -f ikos/Dockerfile --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
