@@ -2,10 +2,11 @@ FROM spacedot/build-base AS clang-build-env
 
 ARG CLANG_TOOLS_VERSION_TAG
 
+RUN apt-get install --yes --no-install-recommends clang lld
 RUN git clone --depth 1 --branch llvmorg-${CLANG_TOOLS_VERSION_TAG} https://github.com/llvm/llvm-project
 WORKDIR /root/llvm-project/build
-RUN cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang-tools-extra;clang" \
-		-DLLVM_TARGETS_TO_BUILD=X86 -DLLVM_BUILD_TESTS=ON -DLLVM_ENABLE_Z3_SOLVER=ON -GNinja
+RUN cmake ../llvm -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_USE_LINKER=lld -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang-tools-extra;clang" -DLLVM_BUILD_TESTS=ON -DLLVM_ENABLE_Z3_SOLVER=ON -DLLVM_TARGETS_TO_BUILD=X86 -GNinja
+
 RUN ninja -j$(nproc) clang-tidy scan-build scan-view clang
 # too much memory for full nproc jobs (> 8 GiB)
 RUN ninja -j$(nproc) check-clang-extra-clang-tidy check-clang-analysis
