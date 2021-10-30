@@ -23,10 +23,10 @@ build-bases:
   stage: build
   script:
     - export BASE_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
-    - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/CI_REGISTRY_USER/build-base:latest
-    - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/CI_REGISTRY_USER/deploy-base:latest
-    - docker save -o build-base.tar $CI_REGISTRY/CI_REGISTRY_USER/build-base
-    - docker save -o deploy-base.tar $CI_REGISTRY/CI_REGISTRY_USER/deploy-base
+    - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:latest
+    - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:latest
+    - docker save -o build-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/build-base
+    - docker save -o deploy-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
   artifacts:
     paths:
       - ./build-base.tar
