@@ -22,7 +22,7 @@ stages:
 build-bases:
   stage: build
   variables:
-    BASE_BUILD_DATE: $(date -u '+%Y%m%dZ%H-%M-%S')
+    BASE_BUILD_DATE: "$(date -u '+%Y%m%dZ%H-%M-%S')"
   script:
     - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/CI_REGISTRY_USER/build-base:latest
     - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/CI_REGISTRY_USER/deploy-base:latest
@@ -35,7 +35,7 @@ build-bases:
 
 cppcheck:
   stage: build
-  dependencies:
+  needs:
     - build-bases
   script:
     - docker load -i ./*.tar
@@ -47,7 +47,7 @@ cppcheck:
 
 doxygen:
   stage: build
-  dependencies:
+  needs:
     - build-bases
   script:
     - docker load -i ./*.tar
@@ -60,7 +60,7 @@ doxygen:
 clang-tools:
   stage: build
   timeout: 6 hours
-  dependencies:
+  needs:
     - build-bases
   script:
     - docker load -i ./*.tar
@@ -72,7 +72,7 @@ clang-tools:
 
 coverage:
   stage: build
-  dependencies:
+  needs:
     - build-bases
   script:
     - docker load -i ./*.tar
@@ -84,7 +84,7 @@ coverage:
 
 ikos:
   stage: build
-  dependencies:
+  needs:
     - build-bases
   script:
     - docker load -i ./*.tar
