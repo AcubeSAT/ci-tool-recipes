@@ -16,7 +16,7 @@ RUN ninja check -j$(nproc)
 
 RUN checkinstall --type=debian --pkgname=ikos --pkgversion=${IKOS_VERSION_TAG} --pkgrelease="CUSTOM" \
 	--provides=ikos \
-	--requires="python3 \(\>= 3.9 \),libgcc-10-dev \(\>= 10.2.1\),libstdc++6 \(\>= 10.2.1\),libsqlite3-0 \(\>= 3.34.1\),libboost-dev \(\>= 1.74.0\),libboost-filesystem-dev \(\>= 1.74.0\),libboost-thread-dev \(\>= 1.74.0\),python3-pygments \(\>= 2.7.1\),libgmpxx4ldbl \(\>= 6.2.1\),libtbb2 \(\>= 2020.3\),zlib1g \(\>= 1.2.11\),llvm-9 \(\>= 9.0.1\),llvm-9-tools \(\>= 9.0.1\),clang-9 \(\>= 9.0.1\),libmpfr6 \(\>= 4.1.0\)" \
+	--requires="python3 \(\>= 3.9 \),libgcc-10-dev \(\>= 10.2.1\),libstdc++6 \(\>= 10.2.1\),libsqlite3-0 \(\>= 3.34.1\),libboost-dev \(\>= 1.74.0\),libboost-filesystem-dev \(\>= 1.74.0\),libboost-thread-dev \(\>= 1.74.0\),python3-pygments \(\>= 2.7.1\),libgmpxx4ldbl \(\>= 6.2.1\),libtbb2 \(\>= 2020.3\),zlib1g \(\>= 1.2.11\),llvm-9 \(\>= 9.0.1\),llvm-9-tools \(\>= 9.0.1\),clang-9 \(\>= 9.0.1\),libmpfr6 \(\>= 4.1.0\),file \(\>= 5.39\)" \
 	--strip=yes --fstrans=no \
 	--default ninja install
 
@@ -24,4 +24,3 @@ FROM spacedot/deploy-base AS final
 WORKDIR /root/
 COPY --from=ikos-build-env /root/ikos/build/*.deb .
 RUN apt install --yes --no-install-recommends ./*.deb
-RUN apt install --yes --no-install-recommends file
