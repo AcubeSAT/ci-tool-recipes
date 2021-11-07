@@ -38,7 +38,7 @@ cppcheck:
   dependencies:
     - build-bases
   script:
-    - ls -1 *.tar | xargs --no-run-if-empty -L 1 docker load -i
+    - ls -1 *.tar | xargs --no-run-if-empty -I docker load -i
     - docker build . -f cppcheck/Dockerfile --build-arg CPPCHECK_VERSION_TAG=$CPPCHECK_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
     - docker save -o cppcheck:$CPPCHECK_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
   artifacts:
@@ -50,7 +50,7 @@ doxygen:
   dependencies:
     - build-bases
   script:
-    - ls -1 *.tar | xargs --no-run-if-empty -L 1 docker load -i
+    - ls -1 *.tar | xargs --no-run-if-empty -I docker load -i
     - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
   artifacts:
@@ -75,7 +75,7 @@ coverage:
   dependencies:
     - build-bases
   script:
-    - ls -1 *.tar | xargs --no-run-if-empty -L 1 docker load -i
+    - ls -1 *.tar | xargs --no-run-if-empty -I docker load -i
     - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
     - docker save -o coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
   artifacts:
@@ -87,7 +87,7 @@ ikos:
   dependencies:
     - build-bases
   script:
-    - ls -1 *.tar | xargs --no-run-if-empty -L 1 docker load -i
+    - ls -1 *.tar | xargs --no-run-if-empty -I docker load -i
     - docker build . -f ikos/Dockerfile --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
     - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
   artifacts:
@@ -105,7 +105,7 @@ deploy-all:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - ls -1 *.tar | xargs --no-run-if-empty -L 1 docker load -i
+    - ls -1 *.tar | xargs --no-run-if-empty -I docker load -i
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
       #    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CPPCHECK_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$CPPCHECK_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
