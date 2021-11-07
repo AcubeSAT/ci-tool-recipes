@@ -57,18 +57,20 @@ doxygen:
     paths:
       - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
 
-        #clang-tools:
-        #  stage: build
-        #  timeout: 6 hours
-        #  needs:
-        #    - build-bases
-        #  script:
-        #    - docker load -i ./*.tar
-        #    - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
-        #    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar 
-        #  artifacts:
-        #    paths:
-        #      - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
+clang-tools:
+  stage: build
+  timeout: 6 hours
+  tags:
+    - elabserver2
+  needs:
+    - build-bases
+  script:
+    - find . -type f -name "*.tar" -exec docker load -i {} \;
+    - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar 
+  artifacts:
+    paths:
+      - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
 
 coverage:
   stage: build
@@ -99,7 +101,7 @@ deploy-all:
   dependencies:
     - cppcheck
     - doxygen
-      #    - clang-tools
+    - clang-tools
     - coverage
     - ikos
   before_script:
@@ -107,7 +109,7 @@ deploy-all:
   script:
     - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
-      #    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CPPCHECK_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CPPCHECK_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
