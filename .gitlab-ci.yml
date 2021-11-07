@@ -59,10 +59,16 @@ doxygen:
 
 clang-tools:
   stage: build
+  services:
+    - name: docker:20.10.8-dind
+      alias: docker
+      command: [ "--tls=false" ]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
   timeout: 6 hours
   tags:
     - local
-  needs:
+  dependencies:
     - build-bases
   script:
     - find . -type f -name "*.tar" -exec docker load -i {} \;
