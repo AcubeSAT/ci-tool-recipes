@@ -16,11 +16,12 @@ variables:
   DOCKER_BUILDKIT: 1
   
 stages:
+  - prebuild
   - build
   - deploy
 
 build-bases:
-  stage: build
+  stage: prebuild
   script:
     - export BASE_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
     - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:latest
