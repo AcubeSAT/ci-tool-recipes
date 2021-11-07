@@ -27,7 +27,7 @@ RUN checkinstall --type=debian --pkgname=cppcheck-htmlreport --pkgversion=${CPPC
 
 WORKDIR /root/cppcheck/build
 RUN checkinstall --type=debian --pkgname=cppcheck --pkgversion=${CPPCHECK_VERSION_TAG} --pkgrelease="CUSTOM" \
-		--provides=cppcheck --requires="libpcre3 \(\>= 8.39\),python3 \(\>= 3.9.2\)" --default
+		--provides=cppcheck --requires="libpcre3 \(\>= 8.39\),python3 \(\>= 3.9.2\)" ninja install
 
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
