@@ -61,7 +61,7 @@ clang-tools:
   stage: build
   timeout: 6 hours
   tags:
-    - elabserver2
+    - local
   needs:
     - build-bases
   script:
