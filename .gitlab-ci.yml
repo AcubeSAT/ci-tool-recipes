@@ -34,7 +34,7 @@ build-bases:
 
 cppcheck:
   stage: build
-  needs:
+  dependencies:
     - build-bases
   script:
     - docker load -i ./*.tar
@@ -46,7 +46,7 @@ cppcheck:
 
 doxygen:
   stage: build
-  needs:
+  dependencies:
     - build-bases
   script:
     - docker load -i ./*.tar
@@ -71,7 +71,7 @@ doxygen:
 
 coverage:
   stage: build
-  needs:
+  dependencies:
     - build-bases
   script:
     - docker load -i ./*.tar
@@ -83,7 +83,7 @@ coverage:
 
 ikos:
   stage: build
-  needs:
+  dependencies:
     - build-bases
   script:
     - docker load -i ./*.tar
