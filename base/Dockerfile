@@ -2,7 +2,7 @@ FROM debian:bullseye-slim AS base
 WORKDIR /root/
 
 RUN apt-get update
-RUN apt-get install --yes --no-install-recommends cmake make python3 python3-pygments 
+RUN apt-get install --yes --no-install-recommends binutils cmake make python3 python3-pygments 
 
 FROM base AS build-base
 RUN apt-get install --yes --no-install-recommends git build-essential ca-certificates checkinstall \
