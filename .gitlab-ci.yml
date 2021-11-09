@@ -21,7 +21,8 @@ stages:
   - deploy
 
 # Base images are published early, in order for the next stages to pull them from Docker Hub
-# without needing to pass them around and without having to edit all dockerfiles
+# without needing to pass them around and without having to edit all dockerfiles, while making
+# sure that only the latest base is used every time
 build-bases:
   stage: prebuild
   script:
@@ -42,6 +43,7 @@ deploy-bases:
   needs:
     - build-bases
   script:
+    - find . -type f -name "*.tar" -exec docker load -i {} \; 
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/build-base
     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
