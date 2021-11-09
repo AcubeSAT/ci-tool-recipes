@@ -21,7 +21,7 @@ stages:
   - deploy
 
 # Base images are published early, in order for the next stages to pull them from Docker Hub
-# without
+# without needing to pass them around and without having to edit all dockerfiles
 build-bases:
   stage: prebuild
   script:
@@ -38,6 +38,8 @@ build-bases:
 deploy-bases:
   stage: prebuild
   dependencies:
+    - build-bases
+  needs:
     - build-bases
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
