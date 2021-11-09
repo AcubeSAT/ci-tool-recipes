@@ -60,7 +60,7 @@ doxygen:
 clang-tools:
   stage: build
   variables:
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: "/certs" # Workaround for DinD failure (gitlab-org/gitlab-runner/issues/4501)
   timeout: 6 hours
   tags:
     - local
@@ -69,7 +69,7 @@ clang-tools:
   script:
     - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
-    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar 
+    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG 
   artifacts:
     paths:
       - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
