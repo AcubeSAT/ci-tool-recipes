@@ -20,25 +20,35 @@ stages:
   - build
   - deploy
 
+# Base images are published early, in order for the next stages to pull them from Docker Hub
+# without
 build-bases:
   stage: prebuild
   script:
     - export BASE_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
-    - docker build . -f base/Dockerfile --target build-base -t docker.io/$CI_REGISTRY_USER/build-base:latest
-    - docker build . -f base/Dockerfile --target deploy-base -t docker.io/$CI_REGISTRY_USER/deploy-base:latest
-    - docker save -o build-base.tar docker.io/$CI_REGISTRY_USER/build-base:latest
-    - docker save -o deploy-base.tar docker.io/$CI_REGISTRY_USER/deploy-base:latest
+    - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:latest
+    - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:latest
+    - docker save -o build-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/build-base
+    - docker save -o deploy-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
   artifacts:
     paths:
       - ./build-base.tar
       - ./deploy-base.tar
+
+deploy-bases:
+  stage: prebuild
+  dependencies:
+    - build-bases
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/build-base
+    - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
 
 cppcheck:
   stage: build
   dependencies:
     - build-bases
   script:
-    - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker build . -f cppcheck/Dockerfile --build-arg CPPCHECK_VERSION_TAG=$CPPCHECK_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
     - docker save -o cppcheck:$CPPCHECK_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
   artifacts:
@@ -50,7 +60,6 @@ doxygen:
   dependencies:
     - build-bases
   script:
-    - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
   artifacts:
@@ -67,7 +76,6 @@ clang-tools:
   dependencies:
     - build-bases
   script:
-    - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
     - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG 
   artifacts:
@@ -79,7 +87,6 @@ coverage:
   dependencies:
     - build-bases
   script:
-    - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
     - docker save -o coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
   artifacts:
@@ -91,7 +98,6 @@ ikos:
   dependencies:
     - build-bases
   script:
-    - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker build . -f ikos/Dockerfile --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
     - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
   artifacts:
