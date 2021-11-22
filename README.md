@@ -47,6 +47,15 @@ are needed for the image to be built successfully.
 
 The `master` branch of this repository is always buildable.
 
+## Issues
+**Docker Hub tags take precedence over local images**
+Local images (specifically build-base and deploy-base) that are reused to create all images of this repo, if pushed to Docker Hub under the same tag as the one pulled as part of the Dockerfiles, will result in building all tools with bases different than the latest.
+
+For example: GitLab needs Docker images to be tagged with form "registry-1.docker.io/spacedot/:" in order to be pushed to Docker Hub. However, the Dockerfiles use FROM spacedot/build-base and FROM spacedot/deploy-base which are shorthand for docker.io/spacedot/build-base and docker.io/spacedot/deploy-base. This difference is significant (technically they are different tags) and as a result, Docker tries to pull the tags from Docker Hub, not the prepared ones from the previous stages.
+
+
+
+
 ## License
 The contents of this repo are licensed under the MIT license. Please make sure you comply with
 each tool's license separately.
