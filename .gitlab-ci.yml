@@ -35,6 +35,10 @@ build-bases:
     paths:
       - ./build-base.tar
       - ./deploy-base.tar
+  only:
+    refs:
+      - master
+
 
 deploy-bases:
   stage: prebuild
@@ -47,6 +51,10 @@ deploy-bases:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/build-base
     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
+  only:
+    refs:
+      - master
+
 
 cppcheck:
   stage: build
@@ -58,6 +66,8 @@ cppcheck:
   artifacts:
     paths:
       - ./cppcheck:$CPPCHECK_VERSION_TAG.tar
+
+
 
 doxygen:
   stage: build
@@ -86,6 +96,7 @@ clang-tools:
     paths:
       - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
 
+
 coverage:
   stage: build
   dependencies:
@@ -96,6 +107,7 @@ coverage:
   artifacts:
     paths:
       - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
+  
 
 ikos:
   stage: build
@@ -107,6 +119,7 @@ ikos:
   artifacts:
     paths:
       - ./ikos:$IKOS_VERSION_TAG.tar
+
 
 deploy-all:
   stage: deploy
@@ -125,3 +138,7 @@ deploy-all:
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+  only:
+    refs:
+    - master
+
