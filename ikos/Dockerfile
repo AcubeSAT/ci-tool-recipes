@@ -23,4 +23,4 @@ RUN checkinstall --type=debian --pkgname=ikos --pkgversion=${IKOS_VERSION_TAG} -
 FROM spacedot/deploy-base AS final
 WORKDIR /root/
 COPY --from=ikos-build-env /root/ikos/build/*.deb .
-RUN apt install --yes --no-install-recommends ./*.deb
+RUN apt install --yes --no-install-recommends ./*.deb wget
