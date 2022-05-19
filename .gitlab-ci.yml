@@ -90,7 +90,7 @@ clang-tools:
   dependencies:
     - build-bases
   script:
-    - docker build . -f clang-tools/Dockerfile --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+    - docker build . -f clang-tools/Dockerfile --network host --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
     - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG 
   artifacts:
     paths:
@@ -114,7 +114,7 @@ ikos:
   dependencies:
     - build-bases
   script:
-    - docker build . -f ikos/Dockerfile --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+    - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
     - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
   artifacts:
     paths:

@@ -23,14 +23,19 @@ RUN bash check.sh
 # Pack everything up if all tests went ok (fstrans=no: reason is https://superuser.com/a/1386314)
 WORKDIR /root/cppcheck/htmlreport
 RUN checkinstall --type=debian --pkgname=cppcheck-htmlreport --pkgversion=${CPPCHECK_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=cppcheck-htmlreport --requires="python3-pygments \(\>= 2.7.1\)" --fstrans=no --pakdir=/root/cppcheck/build/ python3 setup.py install
+	--pkgrelease="CUSTOM" --provides=cppcheck-htmlreport --requires="python3-pygments \(\>= 2.7.1\)" --fstrans=no --pakdir=/root/cppcheck/build/ python3 setup.py install
 
 WORKDIR /root/cppcheck/build
 RUN checkinstall --type=debian --pkgname=cppcheck --pkgversion=${CPPCHECK_VERSION_TAG} --pkgrelease="CUSTOM" \
-		--provides=cppcheck --requires="libpcre3 \(\>= 8.39\),python3 \(\>= 3.9.2\)" ninja install
+	--provides=cppcheck --requires="libpcre3 \(\>= 8.39\),python3 \(\>= 3.9.2\)" ninja install
 
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
+
+# BeautifulSoup to parse the cppcheck XML
+RUN apt install --yes --no-install-recommends python3-pip \
+	&& pip3 install bs4 lxml
+
 COPY --from=cppcheck-build-env /root/cppcheck/build/*.deb ./
 
 # Install everything
