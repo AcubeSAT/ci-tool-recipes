@@ -21,11 +21,11 @@ FROM spacedot/build-base as clang-html-build-env
 ARG CLANG_HTML_VERSION_TAG
 
 RUN apt-get update
-RUN apt-get install --yes --no-install-recommends python3-lxml python3-bs4
+RUN apt-get install --yes --no-install-recommends python3-lxml python3-bs4 python3-certifi
 RUN git clone --depth 1 --branch v${CLANG_HTML_VERSION_TAG} https://github.com/austinbhale/Clang-Visualizer
 WORKDIR Clang-Visualizer
 RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTML_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=clang-tidy-html --requires="python3-lxml \(\>= 4.6.3\),python3-bs4 \(\>= 4.7.1\)" \
+		--pkgrelease="CUSTOM" --provides=clang-tidy-html --requires="python3-lxml \(\>= 4.6.3\),python3-bs4 \(\>= 4.7.1\),python3-certifi \(\>= 2020.6.20\)" \
 		--fstrans=no --default \
 		python3 setup.py install
 
