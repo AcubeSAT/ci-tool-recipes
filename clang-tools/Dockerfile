@@ -31,8 +31,8 @@ RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTM
 
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
-COPY --from=clang-build-env /root/llvm-project/build/*.deb .
-COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb .
+COPY --from=clang-build-env /root/llvm-project/build/*.deb ./
+COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 
 # Install everything
 # perl, libfindbin-libs-perl: used by CMake for building (Needed wherever actual build configuration will happen thru CMake)
@@ -40,4 +40,5 @@ COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb .
 # and thus is not "standalone". This shouldn't matter because here it is used only as a static analysis tool,
 # not for compiling real programs. Proper bootstrapping will take hours to build, and needs a strong PC.
 # TODO when GitLab takes the brunt of building and deployment itself.
+RUN apt update
 RUN apt install --yes --no-install-recommends ./*.deb libc-dev libstdc++-10-dev perl libfindbin-libs-perl
