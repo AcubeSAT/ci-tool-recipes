@@ -20,6 +20,7 @@ FROM spacedot/build-base as clang-html-build-env
 
 ARG CLANG_HTML_VERSION_TAG
 
+RUN apt-get update
 RUN apt-get install --yes --no-install-recommends python3-lxml python3-bs4
 RUN git clone --depth 1 --branch v${CLANG_HTML_VERSION_TAG} https://github.com/austinbhale/Clang-Visualizer
 WORKDIR Clang-Visualizer
