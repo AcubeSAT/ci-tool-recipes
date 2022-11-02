@@ -74,7 +74,7 @@ Therefore, to add a new tool/thing/whatever, the following process **must** be a
 (Buster is old, TODO: run the pipeline against current debian and test that)
 
 *If it's there*: cool! fetch the Debian version and use that. e.g. say you want to use Python 3.
-Debian has it, so you use it as is.
+Debian has it, so you use it as is. If all your dependencies are in Debian repositories, you can jump straight to step 4.
 
 *If it's not there*: cool! go to step 2. Note that all actions on step 2 should be done as a
 separate build step in Docker, whose input must be only an `ARG` with the version and its
