@@ -7,7 +7,7 @@ ARG GCOVR_VERSION_TAG
 RUN git clone --depth 1 --branch ${GCOVR_VERSION_TAG} https://github.com/gcovr/gcovr
 WORKDIR /root/gcovr
 
-RUN apt-get install --yes --no-install-recommends python3-lxml python3-pyutilib python3-jinja2 python3-markupsafe
+RUN apt-get install --yes --no-install-recommends python3-lxml python3-pyutilib python3-jinja2==3.1.2 python3-markupsafe
 RUN python3 setup.py build
 #RUN CC=gcc-10 make test
 RUN checkinstall --type=debian --pkgname=gcovr --pkgversion=${GCOVR_VERSION_TAG} --pkgrelease="CUSTOM" \
