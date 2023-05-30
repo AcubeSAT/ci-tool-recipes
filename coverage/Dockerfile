@@ -11,7 +11,7 @@ RUN apt-get install --yes --no-install-recommends python3-lxml python3-pyutilib 
 RUN python3 setup.py build
 #RUN CC=gcc-10 make test
 RUN checkinstall --type=debian --pkgname=gcovr --pkgversion=${GCOVR_VERSION_TAG} --pkgrelease="CUSTOM" \
-		--provides=gcovr --requires="python3-pygments \(\>= 2.7.1\),python3 \(\>= 3.9.2\),python3-lxml \(\>= 4.6.3\),python3-jinja2 \(\>= 3.1.2\),python3-markupsafe \(\>= 1.1.1\)" --default --fstrans=no python3 setup.py install
+		--provides=gcovr --requires="python3-pygments \(\>= 2.7.1\),python3 \(\>= 3.9.2\),python3-lxml \(\>= 4.6.3\),python3-jinja2 \(\>= 2.11.3\),python3-markupsafe \(\>= 1.1.1\)" --default --fstrans=no python3 setup.py install
 
 FROM spacedot/build-base AS lcov-build-env
 
