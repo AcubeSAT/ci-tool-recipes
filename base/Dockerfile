@@ -12,6 +12,6 @@ RUN pip3 install conan
 
 FROM base AS deploy-base
 RUN apt install --yes --no-install-recommends git build-essential checkinstall \
-    python3-pytest python3-setuptools libxml2-utils libz3-dev python3-lxml libgcc-10-dev python3-pip
+    python3-pytest python3-setuptools libxml2-utils libz3-dev python3-lxml libgcc-12-dev python3-pip
 FROM python:3.11-slim-bullseye
 RUN pip3 install conan
