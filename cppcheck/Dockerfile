@@ -33,8 +33,9 @@ RUN checkinstall --type=debian --pkgname=cppcheck --pkgversion=${CPPCHECK_VERSIO
 FROM spacedot/deploy-base AS final
 
 # BeautifulSoup to parse the cppcheck XML
-RUN apt install --yes --no-install-recommends python3-pip \
-	&& pip3 install bs4 lxml
+RUN apt install --yes --no-install-recommends
+FROM python:3.11-slim-bullseye
+RUN pip3 install bs4 lxml
 
 COPY --from=cppcheck-build-env /root/cppcheck/build/*.deb ./
 
