@@ -35,9 +35,6 @@ build-bases:
     paths:
       - ./build-base.tar
       - ./deploy-base.tar
-  only:
-    refs:
-      - master
 
 cppcheck:
   stage: build
