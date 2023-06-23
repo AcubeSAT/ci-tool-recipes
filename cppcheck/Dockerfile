@@ -41,4 +41,5 @@ RUN pip3 install bs4 lxml
 COPY --from=cppcheck-build-env /root/cppcheck/build/*.deb ./
 
 # Install everything
-RUN apt install --yes --no-install-recommends ./*.deb 
+#RUN apt install --yes --no-install-recommends ./*.deb 
+RUN dpkg -i ./*.deb
