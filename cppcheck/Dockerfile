@@ -22,6 +22,7 @@ RUN bash check.sh
 
 # Pack everything up if all tests went ok (fstrans=no: reason is https://superuser.com/a/1386314)
 WORKDIR /root/cppcheck/htmlreport
+FROM python:3.11-slim-bullseye
 RUN checkinstall --type=debian --pkgname=cppcheck-htmlreport --pkgversion=${CPPCHECK_VERSION_TAG} \
 	--pkgrelease="CUSTOM" --provides=cppcheck-htmlreport --requires="python3-pygments \(\>= 2.7.1\)" --fstrans=no --pakdir=/root/cppcheck/build/ python3 setup.py install
 
