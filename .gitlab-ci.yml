@@ -58,8 +58,8 @@ stages:
 
 cppcheck:
   stage: build
-  dependencies:
-    - build-bases
+  # dependencies:
+  #   - build-bases
   script:
     - docker build . -f cppcheck/Dockerfile --build-arg CPPCHECK_VERSION_TAG=$CPPCHECK_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
     - docker save -o cppcheck:$CPPCHECK_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
