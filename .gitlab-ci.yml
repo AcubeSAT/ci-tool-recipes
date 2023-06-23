@@ -35,25 +35,25 @@ build-bases:
     paths:
       - ./build-base.tar
       - ./deploy-base.tar
-  only:
-    refs:
-      - master
+  # only:
+  #   refs:
+  #     - master
 
 
-deploy-bases:
-  stage: prebuild
-  dependencies:
-    - build-bases
-  needs:
-    - build-bases
-  script:
-    - find . -type f -name "*.tar" -exec docker load -i {} \; 
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/build-base
-    - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
-  only:
-    refs:
-      - master
+# deploy-bases:
+#   stage: prebuild
+#   dependencies:
+#     - build-bases
+#   needs:
+#     - build-bases
+#   script:
+#     - find . -type f -name "*.tar" -exec docker load -i {} \; 
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/build-base
+#     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
+#   only:
+#     refs:
+#       - master
 
 
 cppcheck:
@@ -69,76 +69,76 @@ cppcheck:
 
 
 
-doxygen:
-  stage: build
-  dependencies:
-    - build-bases
-  script:
-    - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
-    - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
-  artifacts:
-    paths:
-      - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
+# doxygen:
+#   stage: build
+#   dependencies:
+#     - build-bases
+#   script:
+#     - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
+#     - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
+#   artifacts:
+#     paths:
+#       - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
 
-clang-tools:
-  stage: build
-  variables:
-   DOCKER_TLS_CERTDIR: "/certs" # Workaround for DinD failure (gitlab-org/gitlab-runner/issues/4501)
-  timeout: 6 hours
-  tags:
-   - local
-  dependencies:
-   - build-bases
-  script:
-   - docker build . -f clang-tools/Dockerfile --network host --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
-   - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG 
-  artifacts:
-   paths:
-     - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
+# clang-tools:
+#   stage: build
+#   variables:
+#    DOCKER_TLS_CERTDIR: "/certs" # Workaround for DinD failure (gitlab-org/gitlab-runner/issues/4501)
+#   timeout: 6 hours
+#   tags:
+#    - local
+#   dependencies:
+#    - build-bases
+#   script:
+#    - docker build . -f clang-tools/Dockerfile --network host --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+#    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG 
+#   artifacts:
+#    paths:
+#      - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
 
 
-coverage:
-  stage: build
-  dependencies:
-    - build-bases
-  script:
-    - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
-    - docker save -o coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
-  artifacts:
-    paths:
-      - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
+# coverage:
+#   stage: build
+#   dependencies:
+#     - build-bases
+#   script:
+#     - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
+#     - docker save -o coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
+#   artifacts:
+#     paths:
+#       - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
   
 
-ikos:
-  stage: build
-  dependencies:
-    - build-bases
-  script:
-    - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-    - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-  artifacts:
-    paths:
-      - ./ikos:$IKOS_VERSION_TAG.tar
+# ikos:
+#   stage: build
+#   dependencies:
+#     - build-bases
+#   script:
+#     - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+#     - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+#   artifacts:
+#     paths:
+#       - ./ikos:$IKOS_VERSION_TAG.tar
 
 
-deploy-all:
-  stage: deploy
-  dependencies:
-    - cppcheck
-    - doxygen
-    - clang-tools
-    - coverage
-    - ikos
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  script:
-    - find . -type f -name "*.tar" -exec docker load -i {} \;
-    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
-    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
-    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
-    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
-    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-  only:
-    refs:
-    - master
+# deploy-all:
+#   stage: deploy
+#   dependencies:
+#     - cppcheck
+#     - doxygen
+#     - clang-tools
+#     - coverage
+#     - ikos
+#   before_script:
+#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+#   script:
+#     - find . -type f -name "*.tar" -exec docker load -i {} \;
+#     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
+#     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+#     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
+#     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
+#     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+#   only:
+#     refs:
+#     - master
 
