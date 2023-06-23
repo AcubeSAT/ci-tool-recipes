@@ -42,4 +42,5 @@ COPY --from=cppcheck-build-env /root/cppcheck/build/*.deb ./
 
 # Install everything
 #RUN apt install --yes --no-install-recommends ./*.deb 
+RUN ls ./
 RUN dpkg -i ./*.deb
