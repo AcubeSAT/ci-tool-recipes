@@ -5,11 +5,13 @@ RUN apt-get update
 RUN apt-get install --yes --no-install-recommends binutils cmake make python3 python3-pygments ca-certificates
 
 FROM base AS build-base
-RUN apt-get install --yes --no-install-recommends git build-essential checkinstall \
-		python3-pytest python3-setuptools libxml2-utils libz3-dev ninja-build python3-pip && \
-    pip install conan
+RUN apt install --yes --no-install-recommends git build-essential checkinstall \
+		python3-pytest python3-setuptools libxml2-utils libz3-dev ninja-build python3-pip
+FROM python:3.11-slim-bullseye
+RUN pip3 install conan
 
 FROM base AS deploy-base
-RUN apt-get install --yes --no-install-recommends git build-essential checkinstall \
-    python3-pytest python3-setuptools libxml2-utils libz3-dev python3-lxml libgcc-10-dev python3-pip && \
-    pip install conan
+RUN apt install --yes --no-install-recommends git build-essential checkinstall \
+    python3-pytest python3-setuptools libxml2-utils libz3-dev python3-lxml libgcc-12-dev python3-pip
+FROM python:3.11-slim-bullseye
+RUN pip3 install conan

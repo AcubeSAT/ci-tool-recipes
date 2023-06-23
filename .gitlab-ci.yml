@@ -1,7 +1,7 @@
-image: docker:20.10.8
+image: docker:24.0.2
 
 services:
-  - docker:20.10.8-dind
+  - docker:24.0.2
 
 variables:
   CPPCHECK_VERSION_TAG: '2.5'
@@ -126,7 +126,7 @@ deploy-all:
   dependencies:
     - cppcheck
     - doxygen
-      #- clang-tools
+    - clang-tools
     - coverage
     - ikos
   before_script:
@@ -134,7 +134,7 @@ deploy-all:
   script:
     - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/cppcheck:$CPPCHECK_VERSION_TAG
-      #- docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
