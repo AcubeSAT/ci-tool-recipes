@@ -4,7 +4,7 @@ services:
   - docker:24.0.2
 
 variables:
-  CPPCHECK_VERSION_TAG: '2.11'
+  CPPCHECK_VERSION_TAG: '2.10'
   DOXYGEN_VERSION_TAG: '1.9.2'
   DOXYGEN_AWESOME_CSS_VERSION_TAG: '1.6.0'
   CLANG_TOOLS_VERSION_TAG: '13.0.0'
@@ -23,18 +23,18 @@ stages:
 # Base images are published early, in order for the next stages to pull them from Docker Hub
 # without needing to pass them around and without having to edit all dockerfiles, while making
 # sure that only the latest base is used every time
-build-bases:
-  stage: prebuild
-  script:
-    - export BASE_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
-    - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:latest
-    - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:latest
-    - docker save -o build-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/build-base
-    - docker save -o deploy-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
-  artifacts:
-    paths:
-      - ./build-base.tar
-      - ./deploy-base.tar
+# build-bases:
+#   stage: prebuild
+#   script:
+#     - export BASE_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
+#     - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:latest
+#     - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:latest
+#     - docker save -o build-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/build-base
+#     - docker save -o deploy-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
+#   artifacts:
+#     paths:
+#       - ./build-base.tar
+#       - ./deploy-base.tar
   # only:
   #   refs:
   #     - master
