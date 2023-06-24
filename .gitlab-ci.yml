@@ -97,16 +97,16 @@ cppcheck:
 #      - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
 
 
-# coverage:
-#   stage: build
-#   dependencies:
-#     - build-bases
-#   script:
-#     - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
-#     - docker save -o coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
-#   artifacts:
-#     paths:
-#       - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
+coverage:
+  stage: build
+  dependencies:
+    - build-bases
+  script:
+    - docker build . -f coverage/Dockerfile --build-arg GCOVR_VERSION_TAG=$GCOVR_VERSION_TAG --build-arg LCOV_VERSION_TAG=$LCOV_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
+    - docker save -o coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
+  artifacts:
+    paths:
+      - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
   
 
 # ikos:

@@ -22,7 +22,7 @@ RUN git clone --depth 1 --branch v${LCOV_VERSION_TAG} https://github.com/linux-t
 WORKDIR /root/lcov
 RUN make check
 RUN checkinstall --type=debian --pkgname=lcov --pkgversion=${LCOV_VERSION_TAG} --pkgrelease="CUSTOM" \
-		--provides=lcov --requires="perl \(\>= 5.32.1\),gcc \(\>= 10.2.1\),g++ \(\>= 10.2.1\)" --default make install
+		--provides=lcov --requires="perl \(\>= 5.32.1\),gcc \(\>= 10.2.1\),g++ \(\>= 10.2.1\)" --default make
 
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
