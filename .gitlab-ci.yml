@@ -11,7 +11,7 @@ variables:
   CLANG_HTML_VERSION_TAG: '1.4.1'
   GCOVR_VERSION_TAG: '6.0'
   LCOV_VERSION_TAG: '1.15'
-  IKOS_VERSION_TAG: '3.0'
+  IKOS_VERSION_TAG: '3.1'
     
   DOCKER_BUILDKIT: 1
   
@@ -69,32 +69,32 @@ cppcheck:
 
 
 
-# doxygen:
-#   stage: build
-#   dependencies:
-#     - build-bases
-#   script:
-#     - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
-#     - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
-#   artifacts:
-#     paths:
-#       - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
-
-# clang-tools:
-#   stage: build
-#   variables:
-#    DOCKER_TLS_CERTDIR: "/certs" # Workaround for DinD failure (gitlab-org/gitlab-runner/issues/4501)
-#   timeout: 6 hours
-#   tags:
-#    - local
-#   dependencies:
+doxygen:
+  stage: build
+#  dependencies:
 #    - build-bases
-#   script:
-#    - docker build . -f clang-tools/Dockerfile --network host --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
-#    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG 
-#   artifacts:
-#    paths:
-#      - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
+  script:
+    - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
+    - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
+  artifacts:
+    paths:
+      - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
+
+clang-tools:
+  stage: build
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs" # Workaround for DinD failure (gitlab-org/gitlab-runner/issues/4501)
+  timeout: 6 hours
+  tags:
+    - local
+  dependencies:
+    - build-bases
+  script:
+    - docker build . -f clang-tools/Dockerfile --network host --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG 
+  artifacts:
+    paths:
+      - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
 
 
 coverage:
@@ -109,16 +109,16 @@ coverage:
       - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
   
 
-# ikos:
-#   stage: build
-#   dependencies:
+ikos:
+  stage: build
+#  dependencies:
 #     - build-bases
-#   script:
-#     - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-#     - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-#   artifacts:
-#     paths:
-#       - ./ikos:$IKOS_VERSION_TAG.tar
+  script:
+    - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+    - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+  artifacts:
+    paths:
+      - ./ikos:$IKOS_VERSION_TAG.tar
 
 
 # deploy-all:

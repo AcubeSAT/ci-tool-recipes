@@ -9,7 +9,7 @@ RUN cmake ..
 RUN make -j$(nproc)
 RUN make tests
 RUN checkinstall --type=debian --pkgname=doxygen --pkgversion=${DOXYGEN_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=doxygen --requires="" make install
+		--pkgrelease="CUSTOM" --provides=doxygen --requires="" make
 
 FROM spacedot/build-base AS doxygen-awesome-css-build-env
 
