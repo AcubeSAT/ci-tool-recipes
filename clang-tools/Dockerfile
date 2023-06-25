@@ -1,20 +1,7 @@
 FROM spacedot/build-base AS clang-build-env
 
 ARG CLANG_TOOLS_VERSION_TAG
-
-RUN git clone --depth 1 --branch llvmorg-${CLANG_TOOLS_VERSION_TAG} https://github.com/llvm/llvm-project
-WORKDIR /root/llvm-project/build
-RUN cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang-tools-extra;clang" \
-		-DLLVM_TARGETS_TO_BUILD=X86 -DLLVM_BUILD_TESTS=ON -DLLVM_ENABLE_Z3_SOLVER=ON -GNinja
-RUN ninja -j$(nproc) clang-tidy scan-build scan-view clang
-# too much memory for full nproc jobs (> 8 GiB)
-RUN ninja -j$(($(nproc) - 2)) check-clang-extra-clang-tidy check-clang-analysis
-RUN checkinstall -type=debian --pkgname=clang-tidy --pkgversion=${CLANG_TOOLS_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=clang-tidy --requires="libz3-4 \(\>= 4.8.10\)" \
-		ninja
-RUN checkinstall -type=debian --pkgname=clang-static-analysis --pkgversion=${CLANG_TOOLS_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=clang-static-analysis \
-		ninja
+RUN apt-get install clang-tools --yes
 
 FROM spacedot/build-base as clang-html-build-env
 
@@ -31,7 +18,6 @@ RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTM
 
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
-COPY --from=clang-build-env /root/llvm-project/build/*.deb ./
 COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 
 # Install everything
