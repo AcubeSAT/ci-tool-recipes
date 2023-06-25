@@ -40,17 +40,17 @@ build-bases:
  #     - master
 
 
-# deploy-bases:
-#   stage: prebuild
-#   dependencies:
-#     - build-bases
-#   needs:
-#     - build-bases
-#   script:
-#     - find . -type f -name "*.tar" -exec docker load -i {} \; 
-#     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-#     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/build-base
-#     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
+deploy-bases:
+  stage: prebuild
+  dependencies:
+    - build-bases
+  needs:
+    - build-bases
+  script:
+    - find . -type f -name "*.tar" -exec docker load -i {} \; 
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/build-base
+    - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
 #  only:
 #     refs:
 #       - master
