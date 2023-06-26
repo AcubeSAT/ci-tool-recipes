@@ -1,8 +1,3 @@
-FROM spacedot/build-base AS clang-build-env
-
-ARG CLANG_TOOLS_VERSION_TAG
-RUN apt-get install clang-tools --yes
-
 FROM spacedot/build-base as clang-html-build-env
 
 ARG CLANG_HTML_VERSION_TAG
@@ -18,6 +13,8 @@ RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTM
 
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
+ARG CLANG_TOOLS_VERSION_TAG
+RUN apt-get install --yes clang-tools clang-tidy
 COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 
 # Install everything
@@ -28,3 +25,4 @@ COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 # TODO when GitLab takes the brunt of building and deployment itself.
 RUN apt update
 RUN apt install --yes --no-install-recommends ./*.deb libc-dev libstdc++-12-dev perl libfindbin-libs-perl
+

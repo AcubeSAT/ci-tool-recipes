@@ -5,12 +5,12 @@ services:
 
 variables:
   CPPCHECK_VERSION_TAG: '2.8'
-  DOXYGEN_VERSION_TAG: '1.9.2'
+  DOXYGEN_VERSION_TAG: '1.9.4-4'
   DOXYGEN_AWESOME_CSS_VERSION_TAG: '1.6.0'
   CLANG_TOOLS_VERSION_TAG: '13.0.0'
   CLANG_HTML_VERSION_TAG: '1.4.1'
   GCOVR_VERSION_TAG: '6.0'
-  LCOV_VERSION_TAG: '1.15'
+  LCOV_VERSION_TAG: '1.15.5a0'
   IKOS_VERSION_TAG: '3.1'
     
   DOCKER_BUILDKIT: 1
@@ -109,16 +109,16 @@ coverage:
       - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
   
 
-ikos:
-  stage: build
-  dependencies:
-    - build-bases
-  script:
-    - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-    - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-  artifacts:
-    paths:
-      - ./ikos:$IKOS_VERSION_TAG.tar
+#ikos:
+#  stage: build
+#  dependencies:
+#    - build-bases
+#  script:
+#    - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+#    - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+#  artifacts:
+#    paths:
+#      - ./ikos:$IKOS_VERSION_TAG.tar
 
 
 deploy-all:
@@ -137,7 +137,7 @@ deploy-all:
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
-    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+#    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
 #   only:
 #     refs:
 #     - master
