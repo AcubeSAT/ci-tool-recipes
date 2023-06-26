@@ -25,4 +25,4 @@ COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 # TODO when GitLab takes the brunt of building and deployment itself.
 RUN apt update
 RUN apt install --yes --no-install-recommends ./*.deb libc-dev libstdc++-12-dev perl libfindbin-libs-perl
-
+RUN apt-get install clang
