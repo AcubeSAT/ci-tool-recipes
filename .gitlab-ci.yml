@@ -12,7 +12,8 @@ variables:
   GCOVR_VERSION_TAG: '6.0'
   LCOV_VERSION_TAG: '1.15.5a0'
   IKOS_VERSION_TAG: '3.1'
-    
+  CONAN_VERSION_TAG: '2.0.6'
+
   DOCKER_BUILDKIT: 1
   
 stages:
@@ -27,8 +28,8 @@ build-bases:
   stage: prebuild
   script:
     - export BASE_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
-    - docker build . -f base/Dockerfile --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:latest
-    - docker build . -f base/Dockerfile --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:latest
+    - docker build . -f base/Dockerfile --build-arg CONAN_VERSION_TAG=$CONAN_VERSION_TAG --target build-base -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-base:latest
+    - docker build . -f base/Dockerfile --build-arg CONAN_VERSION_TAG=$CONAN_VERSION_TAG --target deploy-base -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base:latest
     - docker save -o build-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/build-base
     - docker save -o deploy-base.tar $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
   artifacts:
