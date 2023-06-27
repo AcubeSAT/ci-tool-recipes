@@ -1,21 +1,3 @@
-FROM spacedot/build-base AS clang-build-env
-
-ARG CLANG_TOOLS_VERSION_TAG
-
-RUN git clone --depth 1 --branch llvmorg-${CLANG_TOOLS_VERSION_TAG} https://github.com/llvm/llvm-project
-WORKDIR /root/llvm-project/build
-RUN cmake ../llvm -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS="clang-tools-extra;clang" \
-		-DLLVM_TARGETS_TO_BUILD=X86 -DLLVM_BUILD_TESTS=ON -DLLVM_ENABLE_Z3_SOLVER=ON -GNinja
-RUN ninja -j$(nproc) clang-tidy scan-build scan-view clang
-# too much memory for full nproc jobs (> 8 GiB)
-RUN ninja -j$(($(nproc) - 2)) check-clang-extra-clang-tidy check-clang-analysis
-RUN checkinstall -type=debian --pkgname=clang-tidy --pkgversion=${CLANG_TOOLS_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=clang-tidy --requires="libz3-4 \(\>= 4.8.10\)" \
-		ninja install-clang-tidy-stripped
-RUN checkinstall -type=debian --pkgname=clang-static-analysis --pkgversion=${CLANG_TOOLS_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=clang-static-analysis --requires="libz3-4 \(\>= 4.8.10\),python3 \(\>= 3.9.2\)" \
-		ninja install-clang-stripped install-clang-resource-headers-stripped install-scan-build-stripped install-scan-view-stripped
-
 FROM spacedot/build-base as clang-html-build-env
 
 ARG CLANG_HTML_VERSION_TAG
@@ -31,7 +13,8 @@ RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTM
 
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
-COPY --from=clang-build-env /root/llvm-project/build/*.deb ./
+ARG CLANG_TOOLS_VERSION_TAG
+RUN apt-get install --yes clang-tools clang-tidy
 COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 
 # Install everything
@@ -41,4 +24,5 @@ COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 # not for compiling real programs. Proper bootstrapping will take hours to build, and needs a strong PC.
 # TODO when GitLab takes the brunt of building and deployment itself.
 RUN apt update
-RUN apt install --yes --no-install-recommends ./*.deb libc-dev libstdc++-10-dev perl libfindbin-libs-perl
+RUN apt install --yes --no-install-recommends ./*.deb libc-dev libstdc++-12-dev perl libfindbin-libs-perl
+RUN apt-get install clang
