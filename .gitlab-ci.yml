@@ -110,16 +110,16 @@ coverage:
       - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
   
 
-#ikos:
-#  stage: build
-#  dependencies:
-#    - build-bases
-#  script:
-#    - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-#    - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-#  artifacts:
-#    paths:
-#      - ./ikos:$IKOS_VERSION_TAG.tar
+ikos:
+ stage: build
+ dependencies:
+   - build-bases
+ script:
+   - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+   - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+ artifacts:
+   paths:
+     - ./ikos:$IKOS_VERSION_TAG.tar
 
 
 deploy-all:
