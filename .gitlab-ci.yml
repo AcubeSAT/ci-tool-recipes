@@ -114,7 +114,8 @@ build-arm:
   dependencies:
     - build-bases
   script:
-    - docker build . -f arm/Dockerfile --target build-arm -t $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:$BASE_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:latest
+    - export ARM_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
+    - docker build . -f arm/Dockerfile --target build-arm -t $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:$ARM_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:latest
     - docker save -o build-arm.tar $CI_REGISTRY/$CI_REGISTRY_USER/build-arm
   artifacts:
     paths:
@@ -139,6 +140,7 @@ deploy-all:
     - doxygen
     - clang-tools
     - coverage
+    - build-arm
     #- ikos
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -148,7 +150,7 @@ deploy-all:
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
-    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:latest
+    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/build-arm
 #    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
   only:
     refs:
