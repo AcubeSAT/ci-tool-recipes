@@ -115,7 +115,7 @@ build-arm:
     - build-bases
   script:
     - export ARM_BUILD_DATE=$(date -u '+%Y%m%dZ%H-%M-%S')
-    - docker build . -f arm/Dockerfile --target build-arm -t $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:$ARM_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:latest
+    - docker build . -f arm/Dockerfile -t $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:$ARM_BUILD_DATE -t $CI_REGISTRY/$CI_REGISTRY_USER/build-arm:latest
     - docker save -o build-arm.tar $CI_REGISTRY/$CI_REGISTRY_USER/build-arm
   artifacts:
     paths:
