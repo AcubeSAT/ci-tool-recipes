@@ -80,7 +80,6 @@ doxygen:
     paths:
       - ./doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar
 
-<<<<<<< HEAD
 clang-tools:
   stage: build
   services:
