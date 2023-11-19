@@ -52,8 +52,30 @@ are needed for the image to be built successfully.
 The `master` branch of this repository is always buildable.
 
 ## Guidelines for Creating Images
+### Overview of Base Image Creation for CI
 
-This section offers an exhaustive guide on best practices for Docker image creation. It's designed to be comprehensive, covering scenarios that may not always apply but are critical for those unique cases.
+#### Purpose and Importance
+The goal is to create base images for CI that are clean Debian environments with all tools installed via `apt`,
+using either official repository `.deb` files or custom-crafted ones. This approach ensures:
+
+- **Dependency Matching:** Guarantees that all dependencies of the tools are compatible and function as expected.
+- **Reproducibility:** Ensures that the build process is repeatable, leading to consistent and reliable results.
+- **Trust and Verification:** Maintains a small trust base by using known sources and verifiable builds.
+### Why Custom Docker Images for CI?
+
+#### High-Level Context
+- **Customization:** Tailoring Docker images to the specific needs of the pipeline enhances efficiency and effectiveness.
+- **Control and Security:** Building images from scratch allows for greater control over the contents and security of the images.
+- **Reproducibility and Reliability:** Custom images ensure that the CI environment is consistent across various stages and runs.
+- **Trustworthiness:** By crafting images in a trusted and reproducible manner, the integrity of the CI process is upheld.
+
+### Summary
+Creating custom base images for CI with controlled and known dependencies is crucial for a stable, secure, 
+and efficient CI pipeline. This process involves either using existing `apt` packages or meticulously creating
+custom `.deb` files to ensure compatibility and trustworthiness in the CI environment.
+
+This section offers an exhaustive guide on best practices for Docker image creation. It's designed to be comprehensive, 
+covering scenarios that may not always apply but are critical for those unique cases.
 
 ### Key Principles
 - **Version Transparency:** Ensure every dependency's version is inspectable.
