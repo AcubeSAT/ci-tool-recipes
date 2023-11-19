@@ -87,8 +87,6 @@ clang-tools:
     - docker:24.0.2-dind
 
   timeout: 6 hours
-  tags:
-    - local
   dependencies:
     - build-bases
   script:
