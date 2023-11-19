@@ -14,8 +14,13 @@ A dependency is built from source only if one of the following happens:
 
 - It is not available in distro repos at all
 - It is available but in a different major version than the one specified by the program's
+<<<<<<< HEAD
   vendor as tested, in which case the exact version is built from source against distro
   dependencies.
+=======
+vendor as tested, in which case the exact version is built from source against distro
+dependencies. 
+>>>>>>> 05363f1 (Add guidelines for making compatible Dockerfiles)
 
 No patching is done to program source code itself. Patches may be applied to "peripheral" code
 (e.g launcher scripts) to make them compatible with breakage (e.g. ikos has one such small patch
