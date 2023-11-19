@@ -83,8 +83,6 @@ doxygen:
 
 clang-tools:
   stage: build
-  variables:
-    DOCKER_TLS_CERTDIR: "/certs" # Workaround for DinD failure (gitlab-org/gitlab-runner/issues/4501)
   timeout: 6 hours
   tags:
     - local
