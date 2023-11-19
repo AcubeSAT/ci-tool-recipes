@@ -15,7 +15,7 @@ A dependency is built from source only if one of the following happens:
 - It is not available in distro repos at all
 - It is available but in a different major version than the one specified by the program's
 vendor as tested, in which case the exact version is built from source against distro
-dependencies.
+dependencies. 
 
 No patching is done to program source code itself. Patches may be applied to "peripheral" code
 (e.g launcher scripts) to make them compatible with breakage (e.g. ikos has one such small patch
@@ -51,110 +51,68 @@ are needed for the image to be built successfully.
 
 The `master` branch of this repository is always buildable.
 
-### Guidelines for creating images
+## Guidelines for Creating Images
 
-Note: This is a really long section, and most of the time there's no need to follow everything
-stated here, just a small, relevant part. It is meant to be reasonably exhaustive, and drive
-home what one should need to take care when they need to do something that is not covered here.
+This section offers an exhaustive guide on best practices for Docker image creation. It's designed to be comprehensive, covering scenarios that may not always apply but are critical for those unique cases.
 
-The pipeline was designed with the following requirements:
-- anyone should be able to inspect the versions of the entire million dependencies that make
-  up the tools 
-- keep the trust base (aka the number of sources that are trusted implicitly) small.
+### Key Principles
+- **Version Transparency:** Ensure every dependency's version is inspectable.
+- **Minimal Trust Base:** Keep the number of implicitly trusted sources small.
 
-These requirements are upheld in the following ways:
+### Image Creation Process
+1. **Debian Bookworm Availability:**
+  - Check if the tool is available in Debian Bookworm.
+  - Use the Debian package if available; otherwise, proceed to build from source.
 
-- use `apt` for documenting versions, keeping stuff clean and compatible
-- build everything not included already in Debian from source,
-- anything not already in Debian should have a known version.
+2. **Building from Source:**
+  - Acquire the specific source code version.
+  - Build with Debian's dependencies, adding any missing compatible versions as needed.
+  - Avoid direct `apt update` calls in Dockerfiles for reproducibility.
 
-Therefore, to add a new tool/thing/whatever, the following process **must** be adhered to:
+3. **Testing and Packaging:**
+  - Run available unit tests, documenting any deviations or issues.
+  - Use `checkinstall` for packaging into `.deb` files.
+  - Document the tool's version and any custom dependencies.
 
-1. Check if your tool is available in Debian buster itself in the major version you want.
-(Buster is old, TODO: run the pipeline against current debian and test that)
+4. **Final Assembly:**
+  - In a separate Docker build stage, `COPY` and install all `.deb` files.
+  - Push only after you've tested the image locally.
 
-*If it's there*: cool! fetch the Debian version and use that. e.g. say you want to use Python 3.
-Debian has it, so you use it as is. If all your dependencies are in Debian repositories, you can jump straight to step 4.
+### Special Considerations for Python Packages
+- Find the `requirements.txt`/`pyproject.toml` and identify which python packages can be installed through Debian.
+Prefer Debian Python packages; resort to `pip` only when necessary.
+- Document any deviations from Debian packages, including the rationale.
 
-*If it's not there*: cool! go to step 2. Note that all actions on step 2 should be done as a
-separate build step in Docker, whose input must be only an `ARG` with the version and its
-output one or more .deb packages with documented versions and dependencies.
-
-2. Get the source code of the thing you want at the major version you want, 
-and build that using Debian's dependencies.
-
-Say you want to use gcc 12 for some reason. Debian buster has 8.3, so it's not suitable.
-This means:
-
-a) Get source for gcc 12.x (latest gcc 12.x but nevertheless a specific version). 
-b) Try building it. Use Debian's packages at your disposal to complete the build if
-any are needed. If there is a dependency you need that's not available in Debian itself
-in a compatible version, fetch the correct version's source and build that, recursively.
-
-**IMPORTANT NOTE**: Your package should be buildable against the latest packages from Debian
-`buster`, but your Dockerfile **must never call apt update directly!** The pipeline's first
-stage fetches the latest package list at the time of building, and gets timestamped for
-reproducibility. Calling `apt update` anywhere outside the base images will possibly result
-in your target image having different package list from the base image, thus invalidating
-the guarantee that versions are known in every stage of the pipeline. **Images calling for
-update in the middle of the pipeline WILL be rejected.**
-
-c) After building the main thing you want (or it's dependency, if you do this recursively)
-run its unit tests if they are available. If for any reason you can't run the unit tests,
-*find out why and document it*. They should all pass.
-**Don't include a tool or dependency that has broken unit tests without knowing
-why said tests break and either fixing or documenting the breakage.**
-d) When the unit tests pass, try running your tool yourself to see if it works.
-e) Package the final binaries up with `checkinstall` (see the other Dockerfiles to see how,
-it's a oneliner usually). This process should be done for everything not from Debian, whether
-a library or your main tool. Document the tool's main version and its dependencies (either
-Debian-sourced or custom deb files you made with the recursive process).
-
-If you did this correctly, you should end up with one or more .deb packages.
-One of them is the main tool, the others are it's dependencies that are not available in Debian.
-*Everything must depend*:
-- only on Debian packages
-- OR the custom debs made in the process.
-
-3. *In a separate Docker build stage*, `COPY` all produced debs and install them with `apt install`.
-This will install all stuff needed from Debian at the correct versions,
-and the packages themselves.
-
-4. Test the final image (the one produced by apt installing all the debs).
-If all's OK, push the dockerfile to the repo and it should be included. 
-
-#### Note for Python packages
-
-In case you have Python stuff to include, check its requirements.txt file, or if that's not available,
-one of setup.cfg or setup.py or pyproject.toml to find:
-- either a path to requirements.txt (yes it's that messy, sorry) or 
-- a set of package names and version constraints.
-
-As soon as you have that, do an honest attempt (aka don't immediately give up) searching in Debian
-packages for python-<yourpackagename> or python3-<yourpackagename> usually, to see if Debian has it.
-*If it does*, prefer that instead of using pip, as Debian includes most of the popular Python packages,
-but if it doesn't and following through the dep tree is too hard, just add them from pip
-and let people know.
-
-This is a known weakness, but Python (and in general most languages with a package manager) doesn't
-play well with distros packaging up their libraries, making the trust base shrinking some times
-not worth the bother.
-
+---
 
 ## Issues
 
-**Docker Hub tags take precedence over local images**
-Local images (specifically build-base and deploy-base) that are reused to create all images of this repo,
-if pushed to Docker Hub under the same tag as the one pulled as part of the Dockerfiles, will result in
-building all tools with bases different than the latest.
+### Docker Hub Tag Precedence Issue
 
-For example: GitLab needs Docker images to be tagged with form "registry-1.docker.io/spacedot/:" in order
-to be pushed to Docker Hub. However, the Dockerfiles use `FROM spacedot/build-base` and
-`FROM spacedot/deploy-base` which are shorthand for docker.io/spacedot/build-base and
-docker.io/spacedot/deploy-base.
+This section addresses a conflict between local Docker images and their counterparts on Docker Hub due to tag precedence.
 
-This difference is significant (technically they are different tags) and as a result,
-Docker tries to pull the tags from Docker Hub, not the prepared ones from the previous stages.
+#### Overview
+- **Local vs. Docker Hub Tags:** Local base images (`build-base` and `deploy-base`) are also pushed to Docker Hub with specific tags.
+- **Tagging Format:** In Dockerfiles, these images are referred to with shorthand tags (like `spacedot/build-base`), which Docker interprets as Docker Hub tags (`docker.io/spacedot/build-base`).
+
+#### Problem
+- **Unexpected Pulling from Docker Hub:** When building Docker images, Docker may pull these base images from Docker Hub instead of using the locally prepared versions.
+- **Inconsistencies in Build Process:** This can lead to the use of outdated or different versions of base images than intended, affecting the reliability and consistency of the build process.
+
+#### Impact
+- The behavior can cause discrepancies in the Docker image building process, potentially leading to issues with stability and version control.
+
+#### Resolution Strategy
+- Ensure clear and distinct tagging for local images to prevent overlap with Docker Hub tags.
+- Regularly synchronize local and Docker Hub tags to maintain consistency across builds.
+
+
+---
+
+## Additional Best Practices
+
+- **Layer Optimization:** Combine related commands to reduce image layers.
+- **Documentation:** Maintain clear and detailed documentation for each stage of the image building process, including rationale for specific decisions.
 
 ## License
 The contents of this repo are licensed under the MIT license. Please make sure you comply with
