@@ -83,6 +83,9 @@ doxygen:
 
 clang-tools:
   stage: build
+  services:
+    - docker:24.0.2-dind
+
   timeout: 6 hours
   tags:
     - local
