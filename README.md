@@ -1,10 +1,13 @@
 # AcubeSAT CI tools
 
+
 ## Purpose
+
 This repository contains Docker images for each of the testing tools used in our CI pipelines.
 Built images are being published in Docker Hub, under `spacedot/<folder-name>:<tool-version>`.
 
 ## Image Heritage
+
 All images are based on Debian buster, and the programs within are built from source against
 distro dependencies. Regression tests are run where possible (see table) before packaging.
 A dependency is built from source only if one of the following happens:
@@ -12,7 +15,7 @@ A dependency is built from source only if one of the following happens:
 - It is not available in distro repos at all
 - It is available but in a different major version than the one specified by the program's
 vendor as tested, in which case the exact version is built from source against distro
-dependencies.
+dependencies. 
 
 No patching is done to program source code itself. Patches may be applied to "peripheral" code
 (e.g launcher scripts) to make them compatible with breakage (e.g. ikos has one such small patch
@@ -31,6 +34,7 @@ shall pass its test suite after any patch.
 
 
 ## How to use
+
 In case an update to a tool is published, change the appropriate variable in `.gitlab-ci.yml`
 in a separate branch. GitLab will attempt to build each image, and will also run the test suites
 of each tool. If the build is successful, open a merge request and someone will check and update
@@ -47,14 +51,90 @@ are needed for the image to be built successfully.
 
 The `master` branch of this repository is always buildable.
 
+## Guidelines for Creating Images
+### Overview of Base Image Creation for CI
+
+#### Purpose and Importance
+The goal is to create base images for CI that are clean Debian environments with all tools installed via `apt`,
+using either official repository `.deb` files or custom-crafted ones. This approach ensures:
+
+- **Dependency Matching:** Guarantees that all dependencies of the tools are compatible and function as expected.
+- **Reproducibility:** Ensures that the build process is repeatable, leading to consistent and reliable results.
+- **Trust and Verification:** Maintains a small trust base by using known sources and verifiable builds.
+### Why Custom Docker Images for CI?
+
+#### High-Level Context
+- **Customization:** Tailoring Docker images to the specific needs of the pipeline enhances efficiency and effectiveness.
+- **Control and Security:** Building images from scratch allows for greater control over the contents and security of the images.
+- **Reproducibility and Reliability:** Custom images ensure that the CI environment is consistent across various stages and runs.
+- **Trustworthiness:** By crafting images in a trusted and reproducible manner, the integrity of the CI process is upheld.
+
+### Summary
+Creating custom base images for CI with controlled and known dependencies is crucial for a stable, secure, 
+and efficient CI pipeline. This process involves either using existing `apt` packages or meticulously creating
+custom `.deb` files to ensure compatibility and trustworthiness in the CI environment.
+
+This section offers an exhaustive guide on best practices for Docker image creation. It's designed to be comprehensive, 
+covering scenarios that may not always apply but are critical for those unique cases.
+
+### Key Principles
+- **Version Transparency:** Ensure every dependency's version is inspectable.
+- **Minimal Trust Base:** Keep the number of implicitly trusted sources small.
+
+### Image Creation Process
+1. **Debian Bookworm Availability:**
+  - Check if the tool is available in Debian Bookworm.
+  - Use the Debian package if available; otherwise, proceed to build from source.
+
+2. **Building from Source:**
+  - Acquire the specific source code version.
+  - Build with Debian's dependencies, adding any missing compatible versions as needed.
+  - Avoid direct `apt update` calls in Dockerfiles for reproducibility.
+
+3. **Testing and Packaging:**
+  - Run available unit tests, documenting any deviations or issues.
+  - Use `checkinstall` for packaging into `.deb` files.
+  - Document the tool's version and any custom dependencies.
+
+4. **Final Assembly:**
+  - In a separate Docker build stage, `COPY` and install all `.deb` files.
+  - Push only after you've tested the image locally.
+
+### Special Considerations for Python Packages
+- Find the `requirements.txt`/`pyproject.toml` and identify which python packages can be installed through Debian.
+Prefer Debian Python packages; resort to `pip` only when necessary.
+- Document any deviations from Debian packages, including the rationale.
+
+---
+
 ## Issues
-**Docker Hub tags take precedence over local images**
-Local images (specifically build-base and deploy-base) that are reused to create all images of this repo, if pushed to Docker Hub under the same tag as the one pulled as part of the Dockerfiles, will result in building all tools with bases different than the latest.
 
-For example: GitLab needs Docker images to be tagged with form "registry-1.docker.io/spacedot/:" in order to be pushed to Docker Hub. However, the Dockerfiles use FROM spacedot/build-base and FROM spacedot/deploy-base which are shorthand for docker.io/spacedot/build-base and docker.io/spacedot/deploy-base. This difference is significant (technically they are different tags) and as a result, Docker tries to pull the tags from Docker Hub, not the prepared ones from the previous stages.
+### Docker Hub Tag Precedence Issue
+
+This section addresses a conflict between local Docker images and their counterparts on Docker Hub due to tag precedence.
+
+#### Overview
+- **Local vs. Docker Hub Tags:** Local base images (`build-base` and `deploy-base`) are also pushed to Docker Hub with specific tags.
+- **Tagging Format:** In Dockerfiles, these images are referred to with shorthand tags (like `spacedot/build-base`), which Docker interprets as Docker Hub tags (`docker.io/spacedot/build-base`).
+
+#### Problem
+- **Unexpected Pulling from Docker Hub:** When building Docker images, Docker may pull these base images from Docker Hub instead of using the locally prepared versions.
+- **Inconsistencies in Build Process:** This can lead to the use of outdated or different versions of base images than intended, affecting the reliability and consistency of the build process.
+
+#### Impact
+- The behavior can cause discrepancies in the Docker image building process, potentially leading to issues with stability and version control.
+
+#### Resolution Strategy
+- Ensure clear and distinct tagging for local images to prevent overlap with Docker Hub tags.
+- Regularly synchronize local and Docker Hub tags to maintain consistency across builds.
 
 
+---
 
+## Additional Best Practices
+
+- **Layer Optimization:** Combine related commands to reduce image layers.
+- **Documentation:** Maintain clear and detailed documentation for each stage of the image building process, including rationale for specific decisions.
 
 ## License
 The contents of this repo are licensed under the MIT license. Please make sure you comply with
