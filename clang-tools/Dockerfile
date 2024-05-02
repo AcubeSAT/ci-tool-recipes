@@ -2,7 +2,7 @@ FROM spacedot/build-base as clang-html-build-env
 
 ARG CLANG_HTML_VERSION_TAG
 
-RUN apt-get install --yes --no-install-recommends python3-lxml python3-bs4 python3-certifi
+RUN apt-get update && apt-get install --yes --no-install-recommends python3-lxml python3-bs4 python3-certifi
 RUN git clone --depth 1 --branch v${CLANG_HTML_VERSION_TAG} https://github.com/austinbhale/Clang-Visualizer
 WORKDIR Clang-Visualizer
 RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTML_VERSION_TAG} \
@@ -13,7 +13,7 @@ RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTM
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
 ARG CLANG_TOOLS_VERSION_TAG
-RUN apt-get install --yes clang-tools clang-tidy
+RUN apt-get update && apt-get install --yes clang-tools clang-tidy
 COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 
 # Install everything
