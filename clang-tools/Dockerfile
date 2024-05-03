@@ -2,8 +2,7 @@ FROM spacedot/build-base as clang-html-build-env
 
 ARG CLANG_HTML_VERSION_TAG
 
-RUN apt-get update
-RUN apt-get install --yes --no-install-recommends python3-lxml python3-bs4 python3-certifi
+RUN apt-get update && apt-get install --yes --no-install-recommends python3-lxml python3-bs4 python3-certifi
 RUN git clone --depth 1 --branch v${CLANG_HTML_VERSION_TAG} https://github.com/austinbhale/Clang-Visualizer
 WORKDIR Clang-Visualizer
 RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTML_VERSION_TAG} \
@@ -14,7 +13,7 @@ RUN checkinstall -type=debian --pkgname=clang-tidy-html --pkgversion=${CLANG_HTM
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
 ARG CLANG_TOOLS_VERSION_TAG
-RUN apt-get install --yes clang-tools clang-tidy
+RUN apt-get update && apt-get install --yes clang-tools clang-tidy
 COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 
 # Install everything
@@ -23,6 +22,5 @@ COPY --from=clang-html-build-env /root/Clang-Visualizer/*.deb ./
 # and thus is not "standalone". This shouldn't matter because here it is used only as a static analysis tool,
 # not for compiling real programs. Proper bootstrapping will take hours to build, and needs a strong PC.
 # TODO when GitLab takes the brunt of building and deployment itself.
-RUN apt update
 RUN apt install --yes --no-install-recommends ./*.deb libc-dev libstdc++-12-dev perl libfindbin-libs-perl
 RUN apt-get install clang
