@@ -1,16 +1,3 @@
-FROM spacedot/build-base AS doxygen-build-env
-
-ARG DOXYGEN_VERSION_TAG
-
-RUN apt-get install --yes --no-install-recommends flex bison texlive # texlive: needed to run doxygen's testsuite
-RUN git clone --depth 1 --branch Release_$(echo ${DOXYGEN_VERSION_TAG} | sed 's/\./\_/g') https://github.com/doxygen/doxygen.git
-WORKDIR doxygen/build
-RUN cmake .. 
-RUN make -j$(nproc)
-RUN make tests
-RUN checkinstall --type=debian --pkgname=doxygen --pkgversion=${DOXYGEN_VERSION_TAG} \
-		--pkgrelease="CUSTOM" --provides=doxygen --requires="" make install
-
 FROM spacedot/build-base AS doxygen-awesome-css-build-env
 
 ARG DOXYGEN_AWESOME_CSS_VERSION_TAG
@@ -20,9 +7,9 @@ RUN tar -czvf doxygen-awesome-css.tar.gz --exclude doxygen-awesome-css/.git --ex
 
 # FINAL IMAGE
 FROM spacedot/deploy-base AS final
-COPY --from=doxygen-build-env /root/doxygen/build/*.deb .
+ARG DOXYGEN_VERSION_TAG
+RUN apt-get update && apt-get install --yes doxygen=${DOXYGEN_VERSION_TAG}
 COPY --from=doxygen-awesome-css-build-env /root/*.tar.gz .
 
 # Install everything
-RUN apt install --yes --no-install-recommends ./*.deb && \
-		tar -vzxf *.tar.gz && rm *.tar.gz
+RUN tar -vzxf *.tar.gz && rm *.tar.gz
