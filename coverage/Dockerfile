@@ -8,4 +8,4 @@ RUN pip install gcovr==${GCOVR_VERSION_TAG} --break-system-packages
 
 ARG LCOV_VERSION_TAG
 
-RUN apt-get update && apt-get -y install lcov build-essentials
+RUN apt-get update && apt-get -y install lcov build-essential
