@@ -1,6 +1,6 @@
 # CAUTION: gcovr is untested as tests run only on really old gcc (8)
 
-FROM spacedot/deploy-base AS final
+FROM spacedot/deploy-base AS final 
 
 ARG GCOVR_VERSION_TAG
 

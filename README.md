@@ -70,11 +70,11 @@ using either official repository `.deb` files or custom-crafted ones. This appro
 - **Trustworthiness:** By crafting images in a trusted and reproducible manner, the integrity of the CI process is upheld.
 
 ### Summary
-Creating custom base images for CI with controlled and known dependencies is crucial for a stable, secure,
+Creating custom base images for CI with controlled and known dependencies is crucial for a stable, secure, 
 and efficient CI pipeline. This process involves either using existing `apt` packages or meticulously creating
 custom `.deb` files to ensure compatibility and trustworthiness in the CI environment.
 
-This section offers an exhaustive guide on best practices for Docker image creation. It's designed to be comprehensive,
+This section offers an exhaustive guide on best practices for Docker image creation. It's designed to be comprehensive, 
 covering scenarios that may not always apply but are critical for those unique cases.
 
 ### Key Principles
@@ -83,26 +83,26 @@ covering scenarios that may not always apply but are critical for those unique c
 
 ### Image Creation Process
 1. **Debian Bookworm Availability:**
-- Check if the tool is available in Debian Bookworm.
-- Use the Debian package if available; otherwise, proceed to build from source.
+  - Check if the tool is available in Debian Bookworm.
+  - Use the Debian package if available; otherwise, proceed to build from source.
 
 2. **Building from Source:**
-- Acquire the specific source code version.
-- Build with Debian's dependencies, adding any missing compatible versions as needed.
-- Avoid direct `apt update` calls in Dockerfiles for reproducibility.
+  - Acquire the specific source code version.
+  - Build with Debian's dependencies, adding any missing compatible versions as needed.
+  - Avoid direct `apt update` calls in Dockerfiles for reproducibility.
 
 3. **Testing and Packaging:**
-- Run available unit tests, documenting any deviations or issues.
-- Use `checkinstall` for packaging into `.deb` files.
-- Document the tool's version and any custom dependencies.
+  - Run available unit tests, documenting any deviations or issues.
+  - Use `checkinstall` for packaging into `.deb` files.
+  - Document the tool's version and any custom dependencies.
 
 4. **Final Assembly:**
-- In a separate Docker build stage, `COPY` and install all `.deb` files.
-- Push only after you've tested the image locally.
+  - In a separate Docker build stage, `COPY` and install all `.deb` files.
+  - Push only after you've tested the image locally.
 
 ### Special Considerations for Python Packages
 - Find the `requirements.txt`/`pyproject.toml` and identify which python packages can be installed through Debian.
-  Prefer Debian Python packages; resort to `pip` only when necessary.
+Prefer Debian Python packages; resort to `pip` only when necessary.
 - Document any deviations from Debian packages, including the rationale.
 
 ---

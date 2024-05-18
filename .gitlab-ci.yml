@@ -73,7 +73,7 @@ cppcheck:
 doxygen:
   stage: build
   dependencies:
-    - build-bases
+   - build-bases
   script:
     - docker build . -f doxygen/Dockerfile --build-arg DOXYGEN_VERSION_TAG=$DOXYGEN_VERSION_TAG --build-arg DOXYGEN_AWESOME_CSS_VERSION_TAG=$DOXYGEN_AWESOME_CSS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker save -o doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
@@ -91,7 +91,7 @@ clang-tools:
     - build-bases
   script:
     - docker build . -f clang-tools/Dockerfile --network host --build-arg CLANG_TOOLS_VERSION_TAG=$CLANG_TOOLS_VERSION_TAG --build-arg CLANG_HTML_VERSION_TAG=$CLANG_HTML_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
-    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG
+    - docker save -o clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG 
   artifacts:
     paths:
       - ./clang-tools:$CLANG_TOOLS_VERSION_TAG-html-$CLANG_HTML_VERSION_TAG.tar
@@ -107,7 +107,7 @@ coverage:
   artifacts:
     paths:
       - ./coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG.tar
-
+  
 build-arm:
   stage: build
   dependencies:
@@ -121,15 +121,15 @@ build-arm:
       - ./build-arm.tar
 
 ikos:
-  stage: build
-  dependencies:
-    - build-bases
-  script:
-    - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-    - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
-  artifacts:
-    paths:
-      - ./ikos:$IKOS_VERSION_TAG.tar
+ stage: build
+ dependencies:
+   - build-bases
+ script:
+   - docker build . -f ikos/Dockerfile --network host --build-arg IKOS_VERSION_TAG=$IKOS_VERSION_TAG -t $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+   - docker save -o ikos:$IKOS_VERSION_TAG.tar $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+ artifacts:
+   paths:
+     - ./ikos:$IKOS_VERSION_TAG.tar
 
 
 deploy-all:
