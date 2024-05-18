@@ -1,4 +1,4 @@
-FROM spacedot/build-base AS final
+FROM spacedot/build-base AS ikos-build-env
 
 ARG IKOS_VERSION_TAG
 RUN apt-get update && apt-get install software-properties-common --yes
@@ -22,7 +22,7 @@ RUN checkinstall --type=debian --pkgname=ikos --pkgversion=${IKOS_VERSION_TAG} -
 	--strip=yes --fstrans=no \
 	--default --exclude /usr/bin/python3 ninja install
 
-FROM deploy-base AS final
+FROM spacedot/deploy-base AS final
 WORKDIR /root/
 COPY --from=ikos-build-env /root/ikos/build/*.deb .
 RUN apt-get update && apt-get install --yes --no-install-recommends ./*.deb wget
