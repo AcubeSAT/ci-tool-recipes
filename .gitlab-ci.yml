@@ -11,7 +11,7 @@ variables:
   CLANG_HTML_VERSION_TAG: '1.4.1'
   GCOVR_VERSION_TAG: '6.0'
   LCOV_VERSION_TAG: '1.15.5a0'
-  IKOS_VERSION_TAG: '3.1'
+  IKOS_VERSION_TAG: '3.3'
   CONAN_VERSION_TAG: '2.2.3'
 
   DOCKER_BUILDKIT: 1
@@ -140,7 +140,7 @@ deploy-all:
     - clang-tools
     - coverage
     - build-arm
-    #- ikos
+    - ikos
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
@@ -150,7 +150,7 @@ deploy-all:
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/doxygen:$DOXYGEN_VERSION_TAG-awesomecss-$DOXYGEN_AWESOME_CSS_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/coverage:gcovr-$GCOVR_VERSION_TAG-lcov-$LCOV_VERSION_TAG
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/build-arm
-#    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
+    - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
   only:
     refs:
     - master
