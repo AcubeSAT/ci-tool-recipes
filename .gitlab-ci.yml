@@ -15,7 +15,7 @@ variables:
   CONAN_VERSION_TAG: '2.2.3'
 
   DOCKER_BUILDKIT: 1
-  
+
 stages:
   - prebuild
   - build
@@ -48,7 +48,7 @@ deploy-bases:
   needs:
     - build-bases
   script:
-    - find . -type f -name "*.tar" -exec docker load -i {} \; 
+    - find . -type f -name "*.tar" -exec docker load -i {} \;
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/build-base
     - docker push -a $CI_REGISTRY/$CI_REGISTRY_USER/deploy-base
@@ -153,5 +153,5 @@ deploy-all:
     - docker push $CI_REGISTRY/$CI_REGISTRY_USER/ikos:$IKOS_VERSION_TAG
   only:
     refs:
-    - master
+      - master
 
