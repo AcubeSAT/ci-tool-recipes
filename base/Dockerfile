@@ -14,4 +14,3 @@ ARG CONAN_VERSION_TAG
 RUN apt-get update && apt install --yes --no-install-recommends git checkinstall \
      python3-setuptools libxml2-utils libz3-dev python3-lxml libgcc-12-dev python3-pip
 RUN pip install conan==${CONAN_VERSION_TAG} --break-system-packages
-
