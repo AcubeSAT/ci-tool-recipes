@@ -1,4 +1,4 @@
-FROM spacedot/build-base AS ikos-build-env
+FROM spacedot/build-base AS final
 
 ARG IKOS_VERSION_TAG
 RUN apt-get update && apt-get install software-properties-common --yes
