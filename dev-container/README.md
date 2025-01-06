@@ -13,4 +13,4 @@ Cursor doesn't support dev-containers extension yet. To use the dev-container, y
 1. Run `devcontainer up --workspace-folder .` in the terminal in the project root directory.
 1. To get into the container's shell, run `devcontainer exec --workspace-folder . /bin/bash`.
 
-Everything should be ready to go from there.
+Everything should be ready to go from there. Follow the build instructions & run the in the container.
